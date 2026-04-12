@@ -1,0 +1,484 @@
+{
+  "cards": [
+    {
+      "id": 1,
+      "subject": "L21",
+      "topic": "Transformer 自注意力機制",
+      "content": "Transformer 的核心是「自注意力」：每個詞都能跟句子裡所有詞互相參考，算出彼此的相關性分數，再加權求和。公式是 Attention = softmax(QK^T/√d_k)V。跟 RNN 不同，它可以全部平行計算，不用一個個照順序跑。考試提示：為何除以 √d_k？因為避免點積結果過大導致 softmax 飽和、梯度消失。"
+    },
+    {
+      "id": 2,
+      "subject": "L21",
+      "topic": "Multi-Head Attention",
+      "content": "Multi-Head Attention 就是把注意力機制跑好幾個「頭」，每個頭從不同角度學習詞與詞的關係，最後 concat 起來接一個線性層。好處是模型可以同時捕捉語法、語意、距離等多維度資訊。考試提示：h 個 head 各自有 Q/K/V 投影矩陣，參數量是 4×d_model²，因為 Q、K、V 各一個 d_model×d_k 矩陣，加上輸出投影。"
+    },
+    {
+      "id": 3,
+      "subject": "L21",
+      "topic": "BERT 遮罩語言模型（MLM）",
+      "content": "BERT 的 MLM 預訓練就是把句子裡 15% 的詞遮住（換成 [MASK]），叫模型去猜是什麼詞。因為左右文都看得到，所以叫「雙向」。這跟 GPT 只能看左邊完全不同。考試提示：BERT 的 15% 中有 80% 換成 [MASK]、10% 換成隨機詞、10% 保持原詞，這樣做是為了避免模型推理時從未見過非 [MASK] token 的情況。"
+    },
+    {
+      "id": 4,
+      "subject": "L21",
+      "topic": "BERT 雙向編碼與 NSP",
+      "content": "BERT 除了 MLM，還有「下一句預測（NSP）」任務：給兩個句子，判斷 B 是不是緊接在 A 後面的句子。雙向編碼讓同一個詞根據前後文有不同的向量表示，比 Word2Vec 靜態嵌入強很多。考試提示：BERT-base 有 12 層、768 維、110M 參數；BERT-large 有 24 層、1024 維、340M 參數。"
+    },
+    {
+      "id": 5,
+      "subject": "L21",
+      "topic": "GPT 單向生成架構",
+      "content": "GPT 是「只看左邊」的語言模型，預訓練任務是預測下一個詞。用的是 Transformer 的 Decoder，搭配 Masked Self-Attention，確保位置 i 的詞只能看到 0~i-1 的詞。考試提示：GPT vs BERT——生成任務選 GPT，分類/理解任務選 BERT；BERT 是 Encoder-only，GPT 是 Decoder-only，T5 是 Encoder-Decoder；三者差別常考。"
+    },
+    {
+      "id": 6,
+      "subject": "L21",
+      "topic": "Word2Vec：CBOW vs Skip-gram",
+      "content": "Word2Vec 有兩種：CBOW 是「給你周圍的詞，猜中間的詞」；Skip-gram 是「給你中間的詞，猜周圍的詞」。CBOW 訓練快，Skip-gram 對低頻詞效果更好。考試提示：Skip-gram 適合大資料集和稀有詞；CBOW 適合小資料集和頻繁詞；兩者都是淺層神經網路，輸出靜態詞向量，同一個詞不管在哪個句子都是同一個向量（不像 BERT 有動態上下文表示）。"
+    },
+    {
+      "id": 7,
+      "subject": "L21",
+      "topic": "GloVe 與 Word2Vec 差異",
+      "content": "GloVe 不像 Word2Vec 用局部的滑動窗口，而是直接拿整個語料庫的「共現矩陣」來訓練，讓詞向量的點積近似共現機率的對數。好處是融合了全局統計資訊，在類比任務（king - man + woman = queen）上表現不錯。考試提示：Word2Vec 是局部窗口 + 神經網路；GloVe 是全局共現矩陣 + 加權最小二乘；兩者都輸出靜態詞向量。"
+    },
+    {
+      "id": 8,
+      "subject": "L21",
+      "topic": "TF-IDF 原理",
+      "content": "TF-IDF 是兩個指標的乘積：TF（詞頻）衡量某詞在文章中出現多少次；IDF（逆文件頻率）衡量這個詞在多少篇文章裡出現過，越少出現代表越有區分性。TF-IDF 高的詞就是「這篇文章特有的關鍵詞」。考試提示：IDF = log(N / df)，N 是總文件數，df 是包含該詞的文件數；「的」「是」這類高頻詞 IDF 接近 0，可以自然過濾停用詞。"
+    },
+    {
+      "id": 9,
+      "subject": "L21",
+      "topic": "TF-IDF 限制",
+      "content": "TF-IDF 有幾個明顯缺點：第一，它不懂語意，「汽車」和「車」對它來說是兩個完全不同的詞；第二，向量維度等於詞彙表大小，非常稀疏；第三，忽略詞語順序，「狗咬人」和「人咬狗」的 TF-IDF 完全一樣。考試提示：TF-IDF 適合傳統資訊檢索，不適合需要語意理解的任務，這正是 Word2Vec / BERT 出現的動機。"
+    },
+    {
+      "id": 10,
+      "subject": "L21",
+      "topic": "RAG 檢索增強生成",
+      "content": "RAG 的概念很簡單：LLM 本身記不住所有最新知識，所以先用向量資料庫查詢相關文件，再把文件塞進 prompt，讓模型根據「查到的資料」來回答。這樣不用重新訓練就能更新知識。考試提示：RAG 分兩步——Retrieve（用 embedding 搜相似文件）和 Generate（把文件當 context 生成答案）；常見問題是 Chunk Size 和 Top-K 的設定影響品質。"
+    },
+    {
+      "id": 11,
+      "subject": "L21",
+      "topic": "CNN 卷積層原理",
+      "content": "卷積層用一個小的「濾波器（kernel）」在圖片上滑動，每個位置做點積，輸出一張 feature map。每個濾波器學一種特徵，例如邊緣、紋理。卷積的好處是「局部連接」，只看局部區域；加上「參數共享」，同一個濾波器掃過整張圖，參數遠少於全連接層。考試提示：輸出大小 = (W - F + 2P) / S + 1；W=輸入寬，F=kernel 大小，P=padding，S=stride。"
+    },
+    {
+      "id": 12,
+      "subject": "L21",
+      "topic": "CNN 池化層與參數共享",
+      "content": "池化層（Max/Average Pooling）負責「降維」，把 feature map 縮小，減少計算量，同時增加平移不變性（圖片稍微移動，結果差不多）。Max Pooling 取區域最大值，保留最顯著特徵；Average Pooling 取平均，更平滑。考試提示：池化層沒有可學習的參數；參數共享指的是卷積層的同一個濾波器掃整張圖，大幅降低參數量（對比全連接層每個連接都有獨立參數）。"
+    },
+    {
+      "id": 13,
+      "subject": "L21",
+      "topic": "物件偵測 mAP",
+      "content": "mAP（mean Average Precision）是物件偵測最常用的評估指標。先對每個類別計算 AP（Precision-Recall 曲線下面積），再對所有類別取平均。mAP@0.5 表示 IoU 閾值為 0.5；mAP@0.5:0.95 在多個 IoU 閾值下取平均，更嚴格。考試提示：mAP 越高越好；評估時常需考慮速度（FPS），所以有 YOLO（快）和 DETR（準）的取捨。"
+    },
+    {
+      "id": 14,
+      "subject": "L21",
+      "topic": "物件偵測 IoU",
+      "content": "IoU（Intersection over Union）= 預測框與真實框的重疊面積 / 兩個框的聯集面積。值域 0~1，越接近 1 代表偵測越準。通常設 IoU ≥ 0.5 才算 True Positive，否則算 False Positive。考試提示：考題常給你兩個框的座標叫你算 IoU；IoU 也是 NMS（非極大值抑制）的基礎，用來刪除重複偵測框。"
+    },
+    {
+      "id": 15,
+      "subject": "L21",
+      "topic": "語義分割",
+      "content": "語義分割是給圖片每個像素都貼上類別標籤（例如：這個像素是「道路」、那個是「行人」），但同一類的不同個體不區分。常見架構是 FCN（全卷積網路）和 U-Net。U-Net 有跳接（skip connection）把編碼器特徵傳到解碼器，保留細節。考試提示：語義分割 vs 實例分割的關鍵區別——語義分割不分「第一個人」和「第二個人」，實例分割會。"
+    },
+    {
+      "id": 16,
+      "subject": "L21",
+      "topic": "實例分割與全景分割",
+      "content": "實例分割（如 Mask R-CNN）不只框出物件，還對每個實例輸出精確遮罩，同類但不同個體有不同 ID。全景分割（Panoptic）= 語義分割 + 實例分割的結合，背景用語義分割，前景物件用實例分割。考試提示：三種分割難度排序：語義 < 實例 < 全景；Mask R-CNN = Faster R-CNN + 分割分支；這三種的差異幾乎是必考題。"
+    },
+    {
+      "id": 17,
+      "subject": "L21",
+      "topic": "GAN 生成對抗網路",
+      "content": "GAN 由兩個網路組成：Generator（生成器）負責產生假資料，Discriminator（判別器）負責分辨真假。兩者互相競爭——生成器想騙過判別器，判別器想識破生成器，最終達到納許均衡，讓判別器猜不出哪個是真的（D(G(z)) ≈ 0.5）。考試提示：GAN 的損失函數是 minimax，生成器最小化、判別器最大化；訓練目標和穩定性是考試重點。"
+    },
+    {
+      "id": 18,
+      "subject": "L21",
+      "topic": "GAN 模式崩潰與 Wasserstein GAN",
+      "content": "模式崩潰（Mode Collapse）是 GAN 的常見問題：生成器只學會生成少數幾種樣本（例如只生成一種臉），無法涵蓋真實資料的多樣性。Wasserstein GAN（WGAN）用 Earth Mover Distance 取代 JS 散度，訓練更穩定，梯度消失問題更少。考試提示：WGAN 要對 Critic（不叫 Discriminator）做梯度懲罰（Gradient Penalty，即 WGAN-GP）；模式崩潰和訓練不穩定是 GAN 兩大痛點。"
+    },
+    {
+      "id": 19,
+      "subject": "L21",
+      "topic": "VAE 變分自編碼器",
+      "content": "VAE 的特別之處在於潛在空間（Latent Space）是連續且有規律的。編碼器不輸出固定向量，而是輸出均值 μ 和方差 σ，再從這個分佈取樣。這讓潛在空間「平滑」，可以做插值（兩張臉之間的漸變）。考試提示：VAE 的損失 = 重建誤差 + KL 散度正則項；KL 散度讓潛在分佈接近標準常態 N(0,1)；重參數化技巧（reparameterization trick）讓梯度可以反傳。"
+    },
+    {
+      "id": 20,
+      "subject": "L21",
+      "topic": "擴散模型原理與取樣步數",
+      "content": "擴散模型分兩個過程：Forward（逐步加雜訊直到純雜訊）和 Reverse（模型學習逐步去雜訊）。Stable Diffusion（DDPM）需要 1000 步取樣；DDIM 採樣器可縮短到 50 步，效果接近。取樣步數越多品質越好但越慢。考試提示：擴散模型比 GAN 訓練更穩定，沒有模式崩潰；Stable Diffusion 在潛在空間操作（LDM，Latent Diffusion Model），不是像素空間，所以速度快很多。"
+    },
+    {
+      "id": 21,
+      "subject": "L21",
+      "topic": "擴散模型 CFG（分類器自由引導）",
+      "content": "CFG（Classifier-Free Guidance）是控制文字 prompt 影響力的參數。CFG=1 完全不管 prompt，CFG=7 是常用平衡值，CFG=15+ 過度遵從 prompt 會讓圖失真。原理是混合有條件生成（with prompt）和無條件生成（unconditional）的去雜訊分數。考試提示：CFG 值越高圖片越符合 prompt 描述，但可能犧牲多樣性；「Guidance Scale」就是 CFG Scale，是 Stable Diffusion 最常調的參數之一。"
+    },
+    {
+      "id": 22,
+      "subject": "L21",
+      "topic": "CLIP 對比學習",
+      "content": "CLIP 用「對比學習」把圖片和文字放到同一個嵌入空間：配對的（圖片+對應描述）距離要近，不配對的要遠。訓練資料是網路上爬來的大量圖文對，不需要手動標記，屬於自監督學習。Loss 是 InfoNCE（對稱交叉熵）。考試提示：訓練時 batch 內有 N 個圖文對，形成 N×N 矩陣，對角線是正樣本；CLIP 是零樣本分類的基礎，也是 Stable Diffusion text encoder 的前身。"
+    },
+    {
+      "id": 23,
+      "subject": "L21",
+      "topic": "CLIP 零樣本分類",
+      "content": "CLIP 的殺手鐧是零樣本分類：想分「貓」或「狗」，就把「a photo of a cat」和「a photo of a dog」各自編碼，再跟圖片向量算餘弦相似度，最相近的就是預測結果。完全不需要 fine-tune，也不需要分類資料集。考試提示：CLIP 的零樣本能力來自大規模圖文預訓練；Prompt Engineering（如「a photo of a {label}」vs「{label}」）對結果影響顯著，這也是考試會考的細節。"
+    },
+    {
+      "id": 24,
+      "subject": "L21",
+      "topic": "多模態融合策略",
+      "content": "多模態融合有三種主要策略：早期融合（Early Fusion）在特徵提取前就合併原始資料；晚期融合（Late Fusion）各模態分別預測後再合併結果；中期融合（Middle Fusion）在中間某層合併特徵。考試提示：晚期融合最簡單但無法學跨模態交互；早期融合能學交互但需要對齊；Transformer 的跨注意力（Cross-Attention）是主流的中期融合方式，LLaVA、BLIP-2 等視覺語言模型都用這種架構。"
+    },
+    {
+      "id": 25,
+      "subject": "L21",
+      "topic": "模態缺失處理",
+      "content": "實際部署時常遇到某個模態資料缺失（例如沒有圖片只有文字）。處理方法有：零向量填充（簡單但效果差）、學習缺失模態的代理嵌入（用已有模態推測缺失模態）、訓練時隨機丟棄某模態做資料增強（讓模型學會容忍缺失）。考試提示：模態缺失問題在醫療 AI 中很常見（有時沒有某項檢查結果）；強健的多模態模型需要顯式處理此情況，是架構設計的重要考量。"
+    },
+    {
+      "id": 26,
+      "subject": "L21",
+      "topic": "EU AI Act 風險分級",
+      "content": "EU AI Act 把 AI 分成四個風險等級：不可接受風險（直接禁止，如社會評分系統）、高風險（需嚴格審查，如醫療診斷、招聘篩選、信用評分）、有限風險（需透明揭露，如聊天機器人）、最低風險（幾乎不管，如垃圾郵件過濾）。考試提示：高風險 AI 需符合「可解釋性、準確性、強健性、人類監督」四大要求；違規最高罰款是全球年營業額的 7%。"
+    },
+    {
+      "id": 27,
+      "subject": "L21",
+      "topic": "EU AI Act 禁止用途",
+      "content": "EU AI Act 明確禁止：即時遠端生物辨識（公共場合即時人臉辨識，有部分執法例外）、潛意識操控系統、利用弱勢族群漏洞的 AI、社會信用評分系統。這些屬於「不可接受風險」類別。考試提示：例外情況包括搜尋失蹤兒童、防恐等特定執法場景；注意「即時」vs「後處理」的差異——後者限制較少；違規罰款金額高，所以風險分類是企業必須了解的合規議題。"
+    },
+    {
+      "id": 28,
+      "subject": "L21",
+      "topic": "MLOps Model Registry",
+      "content": "Model Registry 是 MLOps 的核心元件，用來版本管理所有訓練好的模型。記錄每個版本的：訓練資料版本、超參數、評估指標、artifact 路徑。可以設定「Staging → Production → Archived」的生命週期狀態。常見工具有 MLflow、DVC、Weights & Biases。考試提示：Model Registry 解決了「這個模型是哪個版本？用什麼資料訓的？」的問題；沒有 Registry 很難重現實驗結果，是 ML 工程化的基礎。"
+    },
+    {
+      "id": 29,
+      "subject": "L21",
+      "topic": "MLOps 完整流程",
+      "content": "MLOps 流程：資料蒐集 → 特徵工程 → 模型訓練 → 評估 → 打包（Docker）→ 部署（API）→ 監控（漂移偵測）→ 回流資料觸發重訓。整個流程用 CI/CD pipeline 自動化，避免手動操作造成不一致。考試提示：MLOps 跟 DevOps 的最大差別是「資料和模型也是版本控制對象」；Feature Store 負責統一管理特徵，避免 Training-Serving Skew（訓練和推理的特徵計算不一致）。"
+    },
+    {
+      "id": 30,
+      "subject": "L21",
+      "topic": "資料漂移偵測（PSI）",
+      "content": "資料漂移（Data Drift）指輸入特徵的分佈改變了，但標籤的關係沒變。PSI（Population Stability Index）= Σ (實際比例 - 期望比例) × ln(實際/期望)，PSI < 0.1 穩定，0.1~0.25 需注意，> 0.25 需警覺重訓。考試提示：PSI 常用於金融業監控模型輸入是否偏移；資料漂移不一定立刻影響模型表現，但長期會讓模型失準；要定期排程執行漂移偵測。"
+    },
+    {
+      "id": 31,
+      "subject": "L21",
+      "topic": "概念漂移與 KL 散度",
+      "content": "概念漂移（Concept Drift）比資料漂移更嚴重——連「輸入到輸出的映射關係」都改變了（例如：疫情前後「發燒」對診斷的影響不同）。KL 散度（Kullback-Leibler Divergence）衡量兩個分佈的差異，KL(P||Q) = Σ P(x) log(P(x)/Q(x))，值越大代表分佈差距越大。考試提示：KL 散度是不對稱的，KL(P||Q) ≠ KL(Q||P)；偵測到概念漂移通常需要重新標注資料並重訓。"
+    },
+    {
+      "id": 32,
+      "subject": "L21",
+      "topic": "對抗性攻擊",
+      "content": "對抗性攻擊（Adversarial Attack）是故意在輸入加上人眼幾乎看不見的微小擾動，讓模型做出完全錯誤的預測。FGSM（Fast Gradient Sign Method）是最基礎的攻擊：沿損失函數梯度方向加一點點雜訊。白盒攻擊需知道模型結構，黑盒攻擊只需查詢輸出。考試提示：對抗樣本的遷移性很強——對 A 模型有效的對抗樣本，往往對 B 模型也有效；這是 AI 安全部署必須考量的風險。"
+    },
+    {
+      "id": 33,
+      "subject": "L21",
+      "topic": "對抗性攻擊防禦",
+      "content": "防禦對抗性攻擊的主流方法有：對抗訓練（把對抗樣本加進訓練集，讓模型練習；最有效）、輸入平滑化（加高斯濾波去除擾動）、蒸餾（Defensive Distillation）、認證防禦（Randomized Smoothing，理論上保證擾動範圍內的魯棒性）。考試提示：對抗訓練是目前最有效的防禦，但代價是在乾淨資料上的準確率略微下降；沒有一種方法能抵禦所有攻擊（軍備競賽）。"
+    },
+    {
+      "id": 34,
+      "subject": "L21",
+      "topic": "特徵工程：Z-score 標準化",
+      "content": "Z-score 標準化 = (x - μ) / σ，讓特徵變成均值 0、標準差 1 的分佈。好處是消除不同特徵的量綱差異（例如年齡 vs 薪水），讓梯度下降更穩定。注意：Z-score 對離群值（outlier）敏感，因為離群值會拉高 μ 和 σ。考試提示：Z-score 適合接近常態分佈的特徵；若有嚴重離群值，考慮 RobustScaler（用中位數和四分位距取代均值和標準差）。"
+    },
+    {
+      "id": 35,
+      "subject": "L21",
+      "topic": "目標編碼與交互特徵",
+      "content": "目標編碼（Target Encoding）把類別特徵的每個值替換為「該類別的目標均值」。比 One-Hot 省空間，對高基數類別（例如城市名）特別有用。但容易造成資料洩漏，需搭配 cross-validation 或加入平滑項（Additive Smoothing）。交互特徵是把兩個特徵相乘或相加，捕捉非線性關係（例如「年齡×收入」可能比單獨用年齡或收入更有預測力）。考試提示：目標編碼 vs 標籤編碼 vs One-Hot 的適用場景要分清楚。"
+    },
+    {
+      "id": 36,
+      "subject": "L21",
+      "topic": "Kubernetes 容器化部署",
+      "content": "Kubernetes（K8s）是容器編排系統，負責管理多個 Docker 容器的部署、擴展和故障恢復。ML 模型打包成 Docker 映像，透過 K8s 的 Deployment 部署，Service 對外暴露 API。好處是跨雲平台一致性、滾動更新不停機。考試提示：Pod 是 K8s 最小部署單位；Deployment 管理 Pod 副本數；Service 是穩定的網路入口；ConfigMap/Secret 管理設定和憑證；這些概念常一起考。"
+    },
+    {
+      "id": 37,
+      "subject": "L21",
+      "topic": "Kubernetes Auto Scaling",
+      "content": "K8s 有三種 Auto Scaling：HPA（Horizontal Pod Autoscaler）根據 CPU/記憶體使用率自動增減 Pod 數量；VPA（Vertical Pod Autoscaler）調整單個 Pod 的資源請求；KEDA 根據自訂指標（例如 Queue 長度）縮放。考試提示：HPA 最常考；縮放條件通常是 CPU 使用率 > 70% 就擴展；冷啟動延遲是 Serverless AI 部署的常見問題，K8s 搭配 minReplicas > 0 可緩解。"
+    },
+    {
+      "id": 38,
+      "subject": "L21",
+      "topic": "不可否認性與數位簽章",
+      "content": "不可否認性（Non-repudiation）是資安基本原則之一，確保傳送方無法事後否認曾發送某訊息。實作方式是「數位簽章」：用私鑰對訊息雜湊值（hash）加密，接收方用公鑰解密驗證。只有私鑰持有者才能簽名，所以無法否認。考試提示：數位簽章同時提供：完整性（沒被改過）、鑑別性（確認是誰簽的）、不可否認性（不能反悔）；SSL/TLS 憑證就是基於數位簽章的信任鏈。"
+    },
+    {
+      "id": 39,
+      "subject": "L21",
+      "topic": "PCA 降維應用",
+      "content": "PCA（主成分分析）找到資料方差最大的方向（主成分），把高維資料投影到低維空間，同時盡量保留最多資訊。第一主成分解釋最多方差，第二主成分和第一垂直且解釋次多。考試提示：PCA 前要做 Z-score 標準化，否則方差大的特徵會主導結果；「解釋變異量累計達 95%」是選擇保留幾個主成分的常見標準；PCA 不適合非線性資料，改用 t-SNE 或 UMAP 可視化。"
+    },
+    {
+      "id": 40,
+      "subject": "L21",
+      "topic": "漸進式部署策略與 CI/CD",
+      "content": "漸進式部署策略：藍綠部署（同時維護新舊兩版，切流量；rollback 很快但需雙倍資源）、金絲雀部署（先讓 5% 使用者用新版，觀察後再全量；風險最低）、影子部署（新舊版並行，新版只記錄不影響用戶）。CI/CD 中 CI 負責自動測試，CD 負責自動部署。考試提示：金絲雀部署最適合 ML 模型上線（先觀察效能指標再全量）；藍綠部署回滾最快但成本高。"
+    },
+    {
+      "id": 41,
+      "subject": "L23",
+      "topic": "L1（Lasso）vs L2（Ridge）正則化",
+      "content": "L1 正則化（Lasso）在損失函數加 λΣ|w|，會讓部分權重直接變成 0，有特徵選擇效果，輸出稀疏模型。L2 正則化（Ridge）加 λΣw²，讓所有權重都縮小但不會歸零，輸出平滑模型。考試提示：Lasso 適合特徵多且只有少數有用的情況；Ridge 適合所有特徵都可能有用的情況；Elastic Net = L1 + L2 的混合，兼顧兩者優點；三者的幾何解釋（菱形 vs 球形約束）是經典考題。"
+    },
+    {
+      "id": 42,
+      "subject": "L23",
+      "topic": "正則化強度 λ 的調整",
+      "content": "正則化超參數 λ 越大，懲罰越強，模型越簡單（高偏差/欠擬合）；λ 越小，懲罰越弱，模型越複雜（高變異/過擬合）。最佳 λ 通常用交叉驗證來選。考試提示：考題常問「λ 增大對模型有何影響」——答案是偏差增加、變異減少、訓練誤差上升、測試誤差可能先下降再上升；這是偏差-變異取捨（Bias-Variance Tradeoff）的典型應用。"
+    },
+    {
+      "id": 43,
+      "subject": "L23",
+      "topic": "Dropout 原理",
+      "content": "Dropout 訓練時隨機讓一定比例的神經元「睡覺」（輸出設為 0），比例通常 20-50%。每次更新用的是不同的子網路，相當於對多個模型做集成。推理時所有神經元都開著，使用 Inverted Dropout（訓練時就除以保留率），讓推理和訓練的期望值一致。考試提示：Dropout 能有效防止過擬合，但會讓訓練變慢；在 LSTM 中 Dropout 要用在非遞迴連接上；推理時不使用 Dropout（model.eval()）。"
+    },
+    {
+      "id": 44,
+      "subject": "L23",
+      "topic": "早期停止（Early Stopping）",
+      "content": "Early Stopping 是訓練時監控驗證集損失，如果連續 N 個 epoch 驗證損失不再下降就停止訓練，並恢復到最佳 epoch 的權重。好處是防止過擬合、節省訓練時間。考試提示：patience 參數決定等多少個 epoch 沒改善才停；需要在訓練集以外留一份驗證集；和 L1/L2 不同，Early Stopping 是「在時間維度限制模型複雜度」；若訓練損失仍在下降但驗證損失開始上升，就是過擬合的信號。"
+    },
+    {
+      "id": 45,
+      "subject": "L23",
+      "topic": "K-Fold 交叉驗證",
+      "content": "K-Fold 把資料分成 K 等份，每次用 K-1 份訓練、1 份驗證，共跑 K 次，取平均效能。好處是所有資料都被當過驗證集，評估更可靠，對小資料集尤其重要。常見 K=5 或 K=10。考試提示：Leave-One-Out（LOO）= K 等於資料筆數，計算代價超高；K-Fold 不適合時間序列資料（會洩漏未來資訊）；正確做法是在每個 fold 內部分別做資料預處理，不能在 split 前做。"
+    },
+    {
+      "id": 46,
+      "subject": "L23",
+      "topic": "交叉驗證的資料洩漏問題",
+      "content": "資料洩漏（Data Leakage）指訓練時不小心用了「測試時不應該知道的資訊」。常見的 K-Fold 洩漏：在 Split 之前先做標準化（用了全部資料的統計值）或目標編碼（包含測試集的目標值）。正確做法：標準化、特徵選擇、目標編碼都要在每個 fold 的訓練集上 fit，再 transform 驗證集。考試提示：sklearn 的 Pipeline 可以自動把預處理包進 fold 裡，是避免洩漏的最佳實踐。"
+    },
+    {
+      "id": 47,
+      "subject": "L23",
+      "topic": "分層交叉驗證（Stratified K-Fold）",
+      "content": "Stratified K-Fold 在分 fold 時，確保每個 fold 中各類別的比例與整體資料集相同。對類別不平衡問題非常重要——如果用普通 K-Fold，某個 fold 可能完全沒有少數類別。考試提示：處理不平衡分類時（例如 95% 負例、5% 正例），必須用 Stratified K-Fold；否則某些 fold 驗證集裡完全沒有正例，評估指標沒意義；回歸問題可以先把目標值分箱再分層。"
+    },
+    {
+      "id": 48,
+      "subject": "L23",
+      "topic": "時間序列交叉驗證",
+      "content": "時間序列資料不能隨機 shuffle 再 K-Fold，因為未來資料不應該出現在訓練集（資料洩漏）。正確做法是 Walk-Forward Validation（擴張窗口）：第一次用前 1 個月訓練、預測第 2 個月，第二次用前 2 個月訓練、預測第 3 個月，以此類推。考試提示：sklearn 的 TimeSeriesSplit 實現了這個邏輯；Gap 參數可以加入訓練集和驗證集之間的緩衝期，避免因資料相關性造成的洩漏。"
+    },
+    {
+      "id": 49,
+      "subject": "L23",
+      "topic": "Random Forest 特徵子集選取",
+      "content": "Random Forest 在每棵決策樹的每個節點分裂時，只從 m 個隨機特徵（而非全部特徵）中選最佳分裂。這個「特徵子集」策略讓每棵樹都學到不同的模式，降低樹間相關性，集成效果更好。通常 m = √total_features（分類）或 m = total_features/3（回歸）。考試提示：Random Forest = Bagging + Random Feature Subset；純 Bagging 每棵樹用全部特徵，樹之間相關性較高，集成效果較差。"
+    },
+    {
+      "id": 50,
+      "subject": "L23",
+      "topic": "Random Forest 特徵重要性",
+      "content": "Random Forest 可以輸出特徵重要性：計算每個特徵在所有樹中造成的不純度（Gini/Entropy）降低量的平均。重要性高的特徵對預測貢獻大。但有個已知偏差：傾向高估高基數（多類別）特徵的重要性。考試提示：特徵重要性可用來做特徵選擇，但要搭配置換重要性（Permutation Importance）做驗證，後者更可靠；SHAP 是最精確的特徵貢獻計算方式，可以看每筆樣本的貢獻。"
+    },
+    {
+      "id": 51,
+      "subject": "L23",
+      "topic": "XGBoost 正則化",
+      "content": "XGBoost 是梯度提升的高效實作，在目標函數加了正則化項：Ω(f) = γT + ½λΣwj²，其中 T 是葉節點數量，w 是葉節點分數，γ 控制樹的複雜度，λ 做 L2 正則。這讓 XGBoost 比傳統 GBDT 更不容易過擬合。考試提示：XGBoost 用二階泰勒展開近似損失，比 GBDT 的一階更精準；important 超參數：max_depth、learning_rate、n_estimators、subsample（樣本比例）、colsample_bytree（特徵比例）。"
+    },
+    {
+      "id": 52,
+      "subject": "L23",
+      "topic": "XGBoost 並行化與特點",
+      "content": "XGBoost 雖然是 Boosting（序列訓練），但在「單棵樹的節點分裂搜索」上可以並行：對所有特徵同時排序、同時計算最佳分裂點。此外 XGBoost 支援稀疏資料（自動處理缺失值）和列採樣。考試提示：LightGBM 比 XGBoost 更快（Leaf-wise 生長 vs Level-wise，用直方圖近似分裂點）；CatBoost 自動處理類別特徵；這三個框架是 Tabular Data 競賽的主流。"
+    },
+    {
+      "id": 53,
+      "subject": "L23",
+      "topic": "DBSCAN 密度聚類",
+      "content": "DBSCAN 不需要指定群數，根據密度找群。定義：在半徑 ε 內有至少 minPts 個點才是「核心點」；核心點附近的點是「邊界點」；既不是核心也不是邊界的是「雜訊點，標籤為 -1」。群是由核心點和其密度可達的點組成。考試提示：DBSCAN 能找任意形狀的群（不像 K-means 只找球形）；對高維資料效果差（維度詛咒）；雜訊點標籤為 -1 是必考細節。"
+    },
+    {
+      "id": 54,
+      "subject": "L23",
+      "topic": "K-means 原理與限制",
+      "content": "K-means 先隨機放 K 個中心點，然後反覆兩步：E 步（每個點歸入最近的中心）、M 步（重算每個群的中心），直到收斂。目標函數是最小化群內平方和（WCSS/Inertia）。考試提示：K-means 限制：需預先指定 K、只能找球形群、對離群值敏感、結果依賴初始化（用 K-means++ 改善）；選 K 的方法——Elbow Method（畫 inertia vs K 的折彎點）或 Silhouette Score。"
+    },
+    {
+      "id": 55,
+      "subject": "L23",
+      "topic": "PCA 特徵值與解釋變異量",
+      "content": "PCA 的數學核心是對共變異矩陣做特徵值分解。每個特徵向量是一個主成分方向，對應的特徵值代表該方向上的方差。解釋變異量 = 該主成分特徵值 / 所有特徵值之和。考試提示：若考題給你特徵值 [4, 2, 1, 1]，總和=8，前兩個主成分解釋 (4+2)/8=75% 的方差；累計解釋變異量達 95% 是常見的保留主成分數標準；PCA 要先做標準化否則方差大的特徵主導結果。"
+    },
+    {
+      "id": 56,
+      "subject": "L23",
+      "topic": "KNN 距離度量與特徵縮放",
+      "content": "KNN 找最近的 K 個鄰居，用多數決（分類）或平均（回歸）。距離度量：歐氏距離（連續特徵）、曼哈頓距離（高維更穩定）、餘弦相似度（文本）。關鍵：KNN 必須做特徵縮放（標準化），否則量綱大的特徵（薪水）會主導距離計算。考試提示：K 太小過擬合，K 太大欠擬合；KNN 沒有訓練過程，推理時需查遍所有訓練資料（Lazy Learner），適合小資料集，大資料集用 Ball Tree 或 KD-Tree 加速。"
+    },
+    {
+      "id": 57,
+      "subject": "L23",
+      "topic": "SVM 核函數",
+      "content": "SVM 找一個最大間隔超平面（Hyperplane）把兩類分開。當資料線性不可分時，用「核函數」把資料映射到高維空間，在那裡再找線性超平面。常用核函數：線性核、多項式核、RBF（徑向基）核。考試提示：RBF 核的 γ 越大邊界越複雜（過擬合）；C 越大間隔越小越不容忍誤分類（過擬合）；核技巧的妙處是不用真正計算高維向量，只計算原始空間的核函數值（Kernel Trick）。"
+    },
+    {
+      "id": 58,
+      "subject": "L23",
+      "topic": "LSTM 時序預測",
+      "content": "LSTM 用三個門控（遺忘門、輸入門、輸出門）解決 RNN 的梯度消失問題：遺忘門決定丟棄哪些舊記憶，輸入門決定加入哪些新資訊，輸出門決定輸出什麼。Cell State 是長期記憶的「高速公路」，梯度可以流通更長距離。考試提示：LSTM 適合長序列依賴（股價預測、文本生成）；GRU 是 LSTM 的簡化版，合併遺忘門和輸入門，參數更少、效果相當、訓練更快。"
+    },
+    {
+      "id": 59,
+      "subject": "L23",
+      "topic": "MLP Dense 層參數量計算",
+      "content": "全連接層（Dense）的參數量 = (輸入維度 × 輸出維度) + 輸出維度（bias）。例如 Input(784) → Dense(256) → Dense(10)：第一層 784×256+256=200,960；第二層 256×10+10=2,570；總計 203,530 個參數。考試提示：考題最愛問參數量計算；別忘了 bias 項（每個輸出神經元一個 bias）；BatchNorm 層有 2×channels 個可學習參數（γ 和 β）；Dropout 和 Pooling 層沒有可學習參數。"
+    },
+    {
+      "id": 60,
+      "subject": "L23",
+      "topic": "VGG16 架構特點",
+      "content": "VGG16 全部用 3×3 小卷積核，疊 13 個卷積層 + 3 個全連接層。參數量約 138M，其中約 120M 集中在全連接層（FC: 25088→4096→4096→1000）。卷積層只佔約 18M 但學到的特徵很強。考試提示：VGG16 的瓶頸是全連接層佔用太多記憶體和參數；現代架構（ResNet、EfficientNet）用 Global Average Pooling 取代全連接層，大幅減少參數；卷積層 vs 全連接層參數量差距是必考概念。"
+    },
+    {
+      "id": 61,
+      "subject": "L23",
+      "topic": "遷移學習凍結層",
+      "content": "遷移學習分兩個常見策略：Feature Extraction（凍結全部預訓練層，只訓練自己加的分類頭）和 Fine-tuning（先凍結訓練幾個 epoch，再解凍部分或全部層微調）。通常先凍結 features（卷積層），只讓 classifier（全連接層）學習，待穩定後再解凍。考試提示：凍結層的好處是防止 Catastrophic Forgetting（預訓練特徵被破壞）；解凍時要用很小的 learning rate（例如 1e-5）；數據量少時只做 Feature Extraction，數據量多時做 Fine-tuning。"
+    },
+    {
+      "id": 62,
+      "subject": "L23",
+      "topic": "Adam 優化器",
+      "content": "Adam = Adaptive Moment Estimation，結合 Momentum（一階矩，梯度的移動平均）和 RMSProp（二階矩，梯度平方的移動平均）。更新量 = m / (√v + ε)，對不同參數自動調整學習率，收斂快，對 learning rate 初始值不太敏感。考試提示：Adam 的超參數：β1=0.9（動量），β2=0.999（RMSProp），ε=1e-8（防除零）；AdamW = Adam + Weight Decay 解耦，現在更常用；Adam 訓練快但有時泛化不如 SGD+Momentum。"
+    },
+    {
+      "id": 63,
+      "subject": "L23",
+      "topic": "SGD+Momentum 與 RMSProp",
+      "content": "SGD+Momentum 加入了速度項：v = β×v + lr×gradient，更新方向有「慣性」，能越過局部最優的「小坑」。RMSProp 用梯度平方的移動平均來縮放學習率，頻繁更新的參數學習率自動縮小，稀疏梯度的參數學習率自動放大，適合 RNN。考試提示：比較各優化器——SGD 最穩定但收斂最慢；Adam 快速收斂適合大多數情況；SGD+Momentum 有時在 CV 任務上泛化比 Adam 好；Adagrad 對稀疏梯度很好但學習率會單調遞減。"
+    },
+    {
+      "id": 64,
+      "subject": "L23",
+      "topic": "非凸函數與局部最優解",
+      "content": "深度學習的損失函數是非凸的，有很多局部極小值（Local Minimum）、鞍點（Saddle Point）、和一個全局極小值（Global Minimum）。實作中鞍點比局部最小值更是問題，因為在高維空間中鞍點極多，梯度接近 0 但不是最優。Momentum 和 Adam 都能幫助跳出鞍點。考試提示：深度網路的局部最小值通常品質接近全局最小值；真正難的是逃離鞍點；Batch Size 也影響逃離局部最優——小 Batch 的噪聲有助於跳出。"
+    },
+    {
+      "id": 65,
+      "subject": "L23",
+      "topic": "F1 分數計算",
+      "content": "F1 = 2PR/(P+R)，是 Precision 和 Recall 的調和平均數。Precision = TP/(TP+FP)（預測為正例中有多少真的是正例）；Recall = TP/(TP+FN)（所有正例中有多少被找出來）。調和平均數讓 F1 偏向兩者中較低的那個。考試提示：例如 TP=80, FP=20, FN=40，則 P=80/100=0.8，R=80/120≈0.667，F1=2×0.8×0.667/(0.8+0.667)≈0.727；F1 是類別不平衡時最常用的指標。"
+    },
+    {
+      "id": 66,
+      "subject": "L23",
+      "topic": "macro vs micro F1",
+      "content": "多分類 F1 有兩種計算：macro F1 是每個類別分別算 F1 再取平均，所有類別權重相同（對稀少類別更公平）；micro F1 是把所有類別的 TP/FP/FN 加總再算一次 F1（等同 Accuracy 在平衡資料集上）。考試提示：類別嚴重不平衡時，micro F1 被多數類別主導而虛高；macro F1 更能反映稀少類別的表現；如果你的任務關心稀有類別（如罕見病診斷），用 macro F1 評估；還有 weighted F1（按支持數加權）。"
+    },
+    {
+      "id": 67,
+      "subject": "L23",
+      "topic": "R² 決定係數",
+      "content": "R²（決定係數）= 1 - SS_res / SS_tot，衡量模型解釋了多少目標變數的變異。R²=1 完美，R²=0 等同於總是預測均值，R²<0 比直接猜均值還差。注意：加入更多特徵 R² 幾乎不會下降（即使特徵無用），所以用 Adjusted R² 懲罰多餘特徵。考試提示：Adjusted R² = 1 - (1-R²)(n-1)/(n-k-1)，k 是特徵數；R² 高不代表模型預測正確，還要看殘差圖和外部驗證。"
+    },
+    {
+      "id": 68,
+      "subject": "L23",
+      "topic": "殘差圖解讀",
+      "content": "殘差圖（Residual Plot）畫「預測值 vs 殘差（真實值-預測值）」，用來檢查線性回歸的假設。好的殘差圖：點隨機散布在 y=0 附近，無規律。常見問題：若有明顯 U 型，代表漏掉了非線性關係；若方差隨預測值增大（喇叭形），代表異方差（Heteroscedasticity）。考試提示：殘差要符合常態分佈（用 QQ 圖驗證）且方差齊一（Homoscedasticity），這是 OLS 的基本假設；違反假設則估計結果不可信。"
+    },
+    {
+      "id": 69,
+      "subject": "L23",
+      "topic": "SMOTE 過採樣",
+      "content": "SMOTE（Synthetic Minority Over-sampling Technique）解決類別不平衡：不是直接複製少數類別樣本（容易過擬合），而是在少數類別樣本之間「插值」生成新的合成樣本。例如在 A 和 B 兩個少數類別點之間取一個隨機點當新樣本。考試提示：SMOTE 要在 K-Fold 的訓練集內部做，不能在分 fold 之前做（否則驗證集有合成樣本，評估失真）；ADASYN 是改良版，對難分類的樣本生成更多合成樣本。"
+    },
+    {
+      "id": 70,
+      "subject": "L23",
+      "topic": "類別不平衡處理策略",
+      "content": "處理類別不平衡的方法：過採樣（SMOTE）、欠採樣（隨機刪除多數類）、組合採樣（SMOTEENN）、調整類別權重（class_weight='balanced'）、選用合適指標（AUC-ROC、F1 而非 Accuracy）。考試提示：Accuracy 在不平衡資料上是最差的指標（99% 負例資料，模型全預測負例也有 99% Accuracy）；應優先看 Precision、Recall、F1、AUC-ROC；成本敏感學習對不同類別的錯誤設不同懲罰代價，適合醫療、詐欺偵測場景。"
+    },
+    {
+      "id": 71,
+      "subject": "L23",
+      "topic": "貝氏定理",
+      "content": "貝氏定理：P(A|B) = P(B|A) × P(A) / P(B)。直覺解讀：已知 B 發生，A 的機率（後驗）= 在 A 發生的情況下 B 的機率（似然）× A 的先驗機率 / B 的全機率。醫療檢測最常考：敏感度 99% 的檢測，疾病盛行率 1%，陽性預測值其實只有約 50%。考試提示：公式要熟記；先驗（Prior）+ 資料（Likelihood）→ 後驗（Posterior）的更新流程是貝氏推斷的核心思想。"
+    },
+    {
+      "id": 72,
+      "subject": "L23",
+      "topic": "條件機率與獨立性",
+      "content": "條件機率 P(A|B) = P(A∩B) / P(B)，表示「在 B 已發生的條件下，A 發生的機率」。獨立性：若 P(A|B) = P(A)，則 A 和 B 獨立，知道 B 不提供 A 的任何資訊。Naive Bayes 分類器的「Naive」就是假設所有特徵條件獨立，雖然不現實，但在文本分類上往往表現不錯。考試提示：不相關（uncorrelated，協方差=0）≠ 獨立（independent）；例如 X 和 X²，協方差可能為 0 但顯然不獨立。"
+    },
+    {
+      "id": 73,
+      "subject": "L23",
+      "topic": "蒙地卡羅方法",
+      "content": "蒙地卡羅方法用大量隨機取樣來估計數值結果。最經典的例子：在正方形裡隨機撒點，計算落在圓內的比例來估計 π 值。在 ML 中應用：Monte Carlo Dropout（推理時 Dropout 開著多次推理，估計預測不確定性）、強化學習中估計期望回報、貝氏推斷中的 MCMC 取樣。考試提示：取樣數越多估計越精準；蒙地卡羅的誤差以 1/√N 的速率下降（與維度無關，這是它在高維問題上的優勢）。"
+    },
+    {
+      "id": 74,
+      "subject": "L23",
+      "topic": "同態加密",
+      "content": "同態加密允許對「加密資料」直接做計算，得到的結果解密後等同於對原始資料計算。這樣資料持有者可以把加密資料給 ML 服務提供商訓練，提供商永遠看不到原始資料。全同態加密（FHE）支援任意計算，但計算代價非常高（比明文慢數千倍）。考試提示：同態加密 vs 差分隱私——前者保護資料本身不洩漏，後者保護資料集的統計聚合不洩漏個人資訊；兩者可以結合使用。"
+    },
+    {
+      "id": 75,
+      "subject": "L23",
+      "topic": "聯邦學習",
+      "content": "聯邦學習讓多個客戶端（例如各家醫院）在本地訓練模型，只上傳梯度或模型更新，不上傳原始資料，伺服器聚合後更新全局模型。FedAvg 是最常見演算法：各客戶端做幾步 SGD，再把權重平均。考試提示：聯邦學習的挑戰——Non-IID 資料（各客戶端資料分佈不同）、通訊開銷、惡意客戶端（梯度攻擊可能反推訓練資料）；Horizontal FL（特徵相同客戶不同）vs Vertical FL（客戶相同特徵不同）是常見考題。"
+    },
+    {
+      "id": 76,
+      "subject": "L23",
+      "topic": "差分隱私",
+      "content": "差分隱私（Differential Privacy, DP）的定義：對資料集加入或刪除一筆記錄，演算法輸出的分佈變化不超過 e^ε（ε 是隱私預算）。實作方式是在計算結果或梯度上加入校準的隨機雜訊（Laplace 或 Gaussian Mechanism）。ε 越小隱私保護越強但準確率越低。考試提示：DP 保護的是「個人資訊不被推斷出來」；Google 的 RAPPOR 和 Apple 的本地 DP 都是實際應用案例；DP-SGD 是將 DP 應用到深度學習訓練的標準方法。"
+    },
+    {
+      "id": 77,
+      "subject": "L23",
+      "topic": "取樣偏差與標籤偏差",
+      "content": "取樣偏差（Selection Bias）：訓練資料的樣本不能代表真實世界（例如只用城市醫院資料訓練，對農村患者效果差）。標籤偏差（Label Bias）：標注本身含有人類偏見（例如歷史招聘資料反映性別歧視，模型學到了偏見）。考試提示：取樣偏差 vs 標籤偏差 vs 特徵偏差的區別——哪個環節出問題；解法：多樣化資料收集、Fairness-aware 學習、偏差審計（Bias Audit）。"
+    },
+    {
+      "id": 78,
+      "subject": "L23",
+      "topic": "特徵偏差與 AI 公平性",
+      "content": "特徵偏差（Feature Bias）：使用與受保護屬性（種族、性別）高度相關的代理特徵（例如用郵遞區號代理種族）。即使模型不直接用受保護屬性，仍可能產生歧視性結果。AI 公平性指標：Demographic Parity（不同群體正例率相同）、Equalized Odds（不同群體的 TPR 和 FPR 相同）。考試提示：公平性指標通常互相矛盾（Impossibility Theorem），無法同時滿足所有定義，這是 AI 倫理的核心難題。"
+    },
+    {
+      "id": 79,
+      "subject": "L23",
+      "topic": "SHAP 與 LIME 可解釋性",
+      "content": "SHAP 基於博弈論的 Shapley Value，計算每個特徵對預測值的邊際貢獻，滿足可加性（所有 SHAP 值加總等於預測值 - 基準值）。LIME 則是在待解釋樣本附近生成擾動樣本，用局部線性模型近似原模型行為，計算較快但不穩定。考試提示：SHAP 更可靠（有理論保證），LIME 更快；TreeSHAP 對樹模型有多項式時間近似；SHAP Beeswarm Plot 看全局，Force Plot 看單筆樣本；可解釋性是 EU AI Act 高風險 AI 的必要條件。"
+    },
+    {
+      "id": 80,
+      "subject": "L23",
+      "topic": "標準化（Z-score）vs 正規化（Min-Max）",
+      "content": "Z-score 標準化：(x - μ) / σ，結果均值 0、標準差 1，不限定值域，適合常態分佈特徵，對離群值較穩健。Min-Max 正規化：(x - min) / (max - min)，結果縮放到 [0,1]，對離群值極敏感（一個極端值就改變所有資料的縮放）。考試提示：神經網路通常用標準化；圖像像素用 /255 做 Min-Max；KNN/SVM/PCA 對縮放敏感，必須選一種；樹模型（Random Forest、XGBoost）不需要特徵縮放。"
+    }
+  ]
+}

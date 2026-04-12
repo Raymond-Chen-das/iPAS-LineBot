@@ -1,0 +1,38 @@
+name: iPAS 備考推播
+
+on:
+  schedule:
+    # ── 台灣時間 07:00 → UTC 23:00（前一天）
+    - cron: '0 23 * * *'
+    # ── 台灣時間 12:00 → UTC 04:00
+    - cron: '0 4 * * *'
+    # ── 台灣時間 17:00 → UTC 09:00
+    - cron: '0 9 * * *'
+    # ── 台灣時間 21:00 → UTC 13:00
+    - cron: '0 13 * * *'
+
+  # 允許在 GitHub Actions 頁面手動觸發，方便測試
+  workflow_dispatch:
+
+jobs:
+  push-card:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send LINE push message
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: python push.py
