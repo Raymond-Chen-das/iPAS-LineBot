@@ -18,8 +18,8 @@ except ImportError:
     pass
 
 # ── 常數設定 ──────────────────────────────────────────────
-START_DATE = date(2025, 4, 12)   # 備考開始日
-EXAM_DATE  = date(2025, 5, 23)   # 考試日
+START_DATE = date(2026, 4, 12)   # 備考開始日
+EXAM_DATE  = date(2026, 5, 23)   # 考試日
 TOTAL_CARDS = 80
 
 # UTC 小時 → Slot 編號（台灣時間 = UTC+8）
