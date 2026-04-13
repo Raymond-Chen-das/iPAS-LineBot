@@ -18,8 +18,8 @@ except ImportError:
     pass
 
 # ── 常數設定 ──────────────────────────────────────────────
-START_DATE = date(2026, 4, 12)   # 備考開始日
-EXAM_DATE  = date(2026, 5, 23)   # 考試日
+START_DATE  = date(2026, 4, 12)   # 備考開始日
+EXAM_DATE   = date(2026, 5, 23)   # 考試日
 TOTAL_CARDS = 80
 
 # UTC 小時 → Slot 編號（台灣時間 = UTC+8）
@@ -51,6 +51,22 @@ def get_slot() -> int:
     return utc_hour % 4
 
 
+def build_exam_ended_message() -> str:
+    """考試結束後的固定訊息。"""
+    return (
+        "╔══════════════════╗\n"
+        "🎉 iPAS AI 考試結束\n"
+        "╚══════════════════╝\n"
+        "\n"
+        "2026 上半年 iPAS AI 應用規劃師考試已結束！\n"
+        "\n"
+        "感謝這 41 天的每日陪伴，\n"
+        "無論結果如何都辛苦了 💪\n"
+        "\n"
+        "祝金榜題名！🌟"
+    )
+
+
 def build_message(card: dict, day_index: int, days_left: int) -> str:
     """組合 LINE 推播訊息。"""
     subject = card["subject"]
@@ -67,14 +83,15 @@ def build_message(card: dict, day_index: int, days_left: int) -> str:
         f"【{topic}】\n"
         f"{content}\n"
         f"\n"
-        f"🗓 第 {day_index + 1} 天 | 距考試還有 {max(days_left, 0)} 天"
+        f"🗓 第 {day_index + 1} 天 | 距考試還有 {days_left} 天"
     )
     return message
 
 
-def send_line_message(message: str, token: str, user_id: str) -> tuple:
+def send_line_message(message: str, token: str, target_id: str) -> tuple:
     """
     透過 LINE Messaging API 發送 Push Message。
+    target_id 可以是 User ID（U 開頭）或 Group ID（C 開頭）。
     回傳 (status_code, response_text)。
     """
     import requests  # 延遲 import，讓「邏輯測試」不依賴 requests
@@ -85,7 +102,7 @@ def send_line_message(message: str, token: str, user_id: str) -> tuple:
         "Authorization": f"Bearer {token}",
     }
     body = {
-        "to": user_id,
+        "to": target_id,
         "messages": [
             {
                 "type": "text",
@@ -97,50 +114,73 @@ def send_line_message(message: str, token: str, user_id: str) -> tuple:
     return resp.status_code, resp.text
 
 
+def do_push(message: str, token: str, targets: list[str]) -> bool:
+    """對所有 target 發送訊息，全部成功才回傳 True。"""
+    all_ok = True
+    for target_id in targets:
+        label = "群組" if target_id.startswith("C") else "個人"
+        print(f"\n📤 發送至{label}（{target_id[:8]}…）")
+        status_code, resp_text = send_line_message(message, token, target_id)
+        print(f"   HTTP {status_code}")
+        if status_code == 200:
+            print(f"   ✅ 成功")
+        else:
+            print(f"   ❌ 失敗：{resp_text}")
+            all_ok = False
+    return all_ok
+
+
 def main():
     # ── 讀取環境變數 ──────────────────────────────────────
-    token   = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
-    user_id = os.environ.get("LINE_USER_ID", "")
+    token    = os.environ.get("LINE_CHANNEL_ACCESS_TOKEN", "")
+    user_id  = os.environ.get("LINE_USER_ID", "")
+    group_id = os.environ.get("LINE_GROUP_ID", "")   # 選填，有設定才推播到群組
+
+    # 決定推播對象（個人必填，群組選填）
+    targets = [t for t in [user_id, group_id] if t]
 
     # ── 計算天數 ──────────────────────────────────────────
-    today      = date.today()
-    day_index  = (today - START_DATE).days   # 第 0 天 = 2025/4/12
-    days_left  = (EXAM_DATE - today).days
-
-    # ── 選出本次卡片 ──────────────────────────────────────
-    slot       = get_slot()
-    card_index = (day_index * 4 + slot) % TOTAL_CARDS
-
-    cards  = load_cards()
-    card   = cards[card_index]
-    message = build_message(card, day_index, days_left)
+    today     = date.today()
+    day_index = (today - START_DATE).days
+    days_left = (EXAM_DATE - today).days
 
     # ── 印出除錯資訊 ──────────────────────────────────────
     print("=" * 40)
     print(f"  今天：{today}（第 {day_index + 1} 天）")
     print(f"  距考試：{days_left} 天")
-    print(f"  UTC 時間：{datetime.now(timezone.utc).strftime('%H:%M')}（Slot {slot}）")
-    print(f"  卡片索引：{card_index}  →  {card['subject']} - {card['topic']}")
-    print("=" * 40)
-    print(message)
-    print("=" * 40)
+
+    # ── 考試已結束 ────────────────────────────────────────
+    if today > EXAM_DATE:
+        print("  *** 考試已結束，送出結束訊息 ***")
+        print("=" * 40)
+        message = build_exam_ended_message()
+        print(message)
+        print("=" * 40)
+    else:
+        # ── 選出本次卡片 ──────────────────────────────────
+        slot       = get_slot()
+        card_index = (day_index * 4 + slot) % TOTAL_CARDS
+        cards      = load_cards()
+        card       = cards[card_index]
+        message    = build_message(card, day_index, days_left)
+
+        print(f"  UTC 時間：{datetime.now(timezone.utc).strftime('%H:%M')}（Slot {slot}）")
+        print(f"  卡片索引：{card_index}  →  {card['subject']} - {card['topic']}")
+        print("=" * 40)
+        print(message)
+        print("=" * 40)
 
     # ── 發送 LINE 推播 ────────────────────────────────────
-    if not token or not user_id:
+    if not token or not targets:
         print("\n⚠️  未設定 LINE_CHANNEL_ACCESS_TOKEN 或 LINE_USER_ID，跳過發送。")
         print("   本地端請建立 .env 檔案或執行：")
         print("   export LINE_CHANNEL_ACCESS_TOKEN=你的token")
         print("   export LINE_USER_ID=你的userID")
+        print("   export LINE_GROUP_ID=群組ID（選填）")
         sys.exit(0)
 
-    print("\n📤 發送中...")
-    status_code, resp_text = send_line_message(message, token, user_id)
-    print(f"   HTTP {status_code}")
-
-    if status_code == 200:
-        print("✅ 推播成功！")
-    else:
-        print(f"❌ 推播失敗：{resp_text}")
+    success = do_push(message, token, targets)
+    if not success:
         sys.exit(1)
 
 

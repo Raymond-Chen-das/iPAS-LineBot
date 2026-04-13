@@ -26,6 +26,8 @@ _cf_tunnel.log
 _webhook_debug.log
 userid.txt
 get_userid.py
+_group_id.txt
+get_groupid.py
 
 # 系統檔案
 .DS_Store
