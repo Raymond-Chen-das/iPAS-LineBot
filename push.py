@@ -51,23 +51,7 @@ def get_slot() -> int:
     return utc_hour % 4
 
 
-def build_exam_ended_message() -> str:
-    """考試結束後的固定訊息。"""
-    return (
-        "╔══════════════════╗\n"
-        "🎉 iPAS AI 考試結束\n"
-        "╚══════════════════╝\n"
-        "\n"
-        "2026 上半年 iPAS AI 應用規劃師考試已結束！\n"
-        "\n"
-        "感謝這 41 天的每日陪伴，\n"
-        "無論結果如何都辛苦了 💪\n"
-        "\n"
-        "祝金榜題名！🌟"
-    )
-
-
-def build_message(card: dict, day_index: int, days_left: int) -> str:
+def build_message(card: dict, days_left: int) -> str:
     """組合 LINE 推播訊息。"""
     subject = card["subject"]
     topic   = card["topic"]
@@ -83,7 +67,7 @@ def build_message(card: dict, day_index: int, days_left: int) -> str:
         f"【{topic}】\n"
         f"{content}\n"
         f"\n"
-        f"🗓 第 {day_index + 1} 天 | 距考試還有 {days_left} 天"
+        f"🗓 距考試還有 {days_left} 天"
     )
     return message
 
@@ -144,31 +128,26 @@ def main():
     day_index = (today - START_DATE).days
     days_left = (EXAM_DATE - today).days
 
+    # ── 考試已結束，直接停止 ──────────────────────────────
+    if today > EXAM_DATE:
+        print(f"  今天：{today}，考試已於 {EXAM_DATE} 結束，不推送。")
+        sys.exit(0)
+
+    # ── 選出本次卡片 ──────────────────────────────────────
+    slot       = get_slot()
+    card_index = (day_index * 4 + slot) % TOTAL_CARDS
+    cards      = load_cards()
+    card       = cards[card_index]
+    message    = build_message(card, days_left)
+
     # ── 印出除錯資訊 ──────────────────────────────────────
     print("=" * 40)
-    print(f"  今天：{today}（第 {day_index + 1} 天）")
-    print(f"  距考試：{days_left} 天")
-
-    # ── 考試已結束 ────────────────────────────────────────
-    if today > EXAM_DATE:
-        print("  *** 考試已結束，送出結束訊息 ***")
-        print("=" * 40)
-        message = build_exam_ended_message()
-        print(message)
-        print("=" * 40)
-    else:
-        # ── 選出本次卡片 ──────────────────────────────────
-        slot       = get_slot()
-        card_index = (day_index * 4 + slot) % TOTAL_CARDS
-        cards      = load_cards()
-        card       = cards[card_index]
-        message    = build_message(card, day_index, days_left)
-
-        print(f"  UTC 時間：{datetime.now(timezone.utc).strftime('%H:%M')}（Slot {slot}）")
-        print(f"  卡片索引：{card_index}  →  {card['subject']} - {card['topic']}")
-        print("=" * 40)
-        print(message)
-        print("=" * 40)
+    print(f"  今天：{today} | 距考試：{days_left} 天")
+    print(f"  UTC 時間：{datetime.now(timezone.utc).strftime('%H:%M')}（Slot {slot}）")
+    print(f"  卡片索引：{card_index}  →  {card['subject']} - {card['topic']}")
+    print("=" * 40)
+    print(message)
+    print("=" * 40)
 
     # ── 發送 LINE 推播 ────────────────────────────────────
     if not token or not targets:
