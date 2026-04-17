@@ -100,6 +100,7 @@ def send_line_message(message: str, token: str, target_id: str) -> tuple:
 
 def do_push(message: str, token: str, targets: list[str]) -> bool:
     """對所有 target 發送訊息，全部成功才回傳 True。"""
+    import json
     all_ok = True
     for target_id in targets:
         label = "群組" if target_id.startswith("C") else "個人"
@@ -109,6 +110,14 @@ def do_push(message: str, token: str, targets: list[str]) -> bool:
         if status_code == 200:
             print(f"   ✅ 成功")
         else:
+            try:
+                err_data = json.loads(resp_text)
+                err_msg = err_data.get("message", "")
+                if "monthly limit" in err_msg and label == "群組":
+                    print(f"   ⚠️  月配額已滿，跳過群組推播")
+                    continue
+            except:
+                pass
             print(f"   ❌ 失敗：{resp_text}")
             all_ok = False
     return all_ok
