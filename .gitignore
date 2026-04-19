@@ -32,3 +32,4 @@ get_groupid.py
 # 系統檔案
 .DS_Store
 Thumbs.db
+.claude

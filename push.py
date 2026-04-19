@@ -2,7 +2,7 @@ import io
 import json
 import os
 import sys
-from datetime import datetime, date, timezone
+from datetime import date, datetime, timezone
 
 # 強制 stdout 使用 UTF-8，避免 Windows cp950 無法輸出 emoji
 if hasattr(sys.stdout, "reconfigure"):
@@ -20,14 +20,7 @@ except ImportError:
 # ── 常數設定 ──────────────────────────────────────────────
 START_DATE  = date(2026, 4, 12)   # 備考開始日
 EXAM_DATE   = date(2026, 5, 23)   # 考試日
-TOTAL_CARDS = 80
-
-# UTC 小時 → Slot 編號（台灣時間 = UTC+8）
-#   台灣 07:00 = UTC 23:00（前一天）→ slot 0
-#   台灣 12:00 = UTC 04:00          → slot 1
-#   台灣 17:00 = UTC 09:00          → slot 2
-#   台灣 21:00 = UTC 13:00          → slot 3
-SLOT_MAP = {23: 0, 4: 1, 9: 2, 13: 3}
+TOTAL_CARDS = 20                  # 20 題模擬題，每天 1 題
 
 
 def load_cards() -> list:
@@ -39,29 +32,14 @@ def load_cards() -> list:
     return data["cards"]
 
 
-def get_slot() -> int:
-    """
-    根據當前 UTC 小時決定推播 slot（0-3）。
-    若不在預定時間（例如本地手動測試），用 UTC 小時 mod 4 作為 fallback。
-    """
-    utc_hour = datetime.now(timezone.utc).hour
-    if utc_hour in SLOT_MAP:
-        return SLOT_MAP[utc_hour]
-    # fallback：本地測試用，讓每次執行都能看到卡片
-    return utc_hour % 4
-
-
 def build_message(card: dict, days_left: int) -> str:
     """組合 LINE 推播訊息。"""
-    subject = card["subject"]
     topic   = card["topic"]
     content = card["content"]
 
-    emoji = "📘" if subject == "L21" else "📗"
-
     message = (
         f"╔══════════════════╗\n"
-        f"{emoji} {subject} 考點速記\n"
+        f"📘 L21 模擬題特訓\n"
         f"╚══════════════════╝\n"
         f"\n"
         f"【{topic}】\n"
@@ -98,9 +76,8 @@ def send_line_message(message: str, token: str, target_id: str) -> tuple:
     return resp.status_code, resp.text
 
 
-def do_push(message: str, token: str, targets: list[str]) -> bool:
-    """對所有 target 發送訊息，全部成功才回傳 True。"""
-    import json
+def do_push(message: str, token: str, targets: list) -> bool:
+    """對所有 target 發送訊息。遇到月配額已滿時跳過不視為失敗。"""
     all_ok = True
     for target_id in targets:
         label = "群組" if target_id.startswith("C") else "個人"
@@ -109,17 +86,19 @@ def do_push(message: str, token: str, targets: list[str]) -> bool:
         print(f"   HTTP {status_code}")
         if status_code == 200:
             print(f"   ✅ 成功")
-        else:
-            try:
-                err_data = json.loads(resp_text)
-                err_msg = err_data.get("message", "")
-                if "monthly limit" in err_msg and label == "群組":
-                    print(f"   ⚠️  月配額已滿，跳過群組推播")
-                    continue
-            except:
-                pass
-            print(f"   ❌ 失敗：{resp_text}")
-            all_ok = False
+            continue
+
+        # 非 200：判斷是否為月配額已滿
+        try:
+            err_msg = json.loads(resp_text).get("message", "")
+        except Exception:
+            err_msg = ""
+        if "monthly limit" in err_msg:
+            print(f"   ⚠️  月配額已滿，跳過{label}推播")
+            continue
+
+        print(f"   ❌ 失敗：{resp_text}")
+        all_ok = False
     return all_ok
 
 
@@ -129,7 +108,6 @@ def main():
     user_id  = os.environ.get("LINE_USER_ID", "")
     group_id = os.environ.get("LINE_GROUP_ID", "")   # 選填，有設定才推播到群組
 
-    # 決定推播對象（個人必填，群組選填）
     targets = [t for t in [user_id, group_id] if t]
 
     # ── 計算天數 ──────────────────────────────────────────
@@ -142,18 +120,16 @@ def main():
         print(f"  今天：{today}，考試已於 {EXAM_DATE} 結束，不推送。")
         sys.exit(0)
 
-    # ── 選出本次卡片 ──────────────────────────────────────
-    slot       = get_slot()
-    card_index = (day_index * 4 + slot) % TOTAL_CARDS
+    # ── 選出本次卡片（每天一題） ──────────────────────────
+    card_index = max(day_index, 0) % TOTAL_CARDS
     cards      = load_cards()
     card       = cards[card_index]
     message    = build_message(card, days_left)
 
-    # ── 印出除錯資訊 ──────────────────────────────────────
     print("=" * 40)
     print(f"  今天：{today} | 距考試：{days_left} 天")
-    print(f"  UTC 時間：{datetime.now(timezone.utc).strftime('%H:%M')}（Slot {slot}）")
-    print(f"  卡片索引：{card_index}  →  {card['subject']} - {card['topic']}")
+    print(f"  UTC 時間：{datetime.now(timezone.utc).strftime('%H:%M')}")
+    print(f"  卡片索引：{card_index}  →  {card['topic']}")
     print("=" * 40)
     print(message)
     print("=" * 40)
@@ -161,10 +137,6 @@ def main():
     # ── 發送 LINE 推播 ────────────────────────────────────
     if not token or not targets:
         print("\n⚠️  未設定 LINE_CHANNEL_ACCESS_TOKEN 或 LINE_USER_ID，跳過發送。")
-        print("   本地端請建立 .env 檔案或執行：")
-        print("   export LINE_CHANNEL_ACCESS_TOKEN=你的token")
-        print("   export LINE_USER_ID=你的userID")
-        print("   export LINE_GROUP_ID=群組ID（選填）")
         sys.exit(0)
 
     success = do_push(message, token, targets)

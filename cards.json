@@ -4,481 +4,121 @@
       "id": 1,
       "subject": "L21",
       "topic": "Transformer 自注意力機制",
-      "content": "每個詞計算與全句所有詞的相關性，加權求和得到表示，可完全平行計算。考試：除以√d_k 是為了防止點積過大導致梯度消失。"
+      "content": "某跨國公司導入 Transformer 開發多語客服系統，能顯著改善長篇翻譯品質的主要原因？\n\n(A) 自注意力機制捕捉長距離語境依賴\n(B) 卷積運算加速訓練過程\n(C) 強化學習調整生成策略\n(D) 資料增強平衡多語語料\n\n✅ 答案：A\n💡 Self-Attention 可平行計算，每個詞與全句所有詞算相關性，突破 RNN 的長距離依賴瓶頸。"
     },
     {
       "id": 2,
       "subject": "L21",
-      "topic": "Multi-Head Attention",
-      "content": "多頭注意力從不同角度同時學詞間關係，結果 concat 後接線性層。考試：h 個頭總參數量為 4×d_model²。"
+      "topic": "BERT 遮罩語言模型 (MLM)",
+      "content": "BERT 預訓練中「遮罩語言模型 (MLM)」的主要策略為何？\n\n(A) 依序遮罩句尾詞，由左到右逐步生成\n(B) 隨機遮罩部分詞，根據雙向上下文預測\n(C) 對抗訓練生成語意相似擾動樣本\n(D) 以 Decoder 結構重建整句內容\n\n✅ 答案：B\n💡 BERT 雙向理解能力來自 MLM——同時看左右文預測被遮罩詞，這是理解類任務 (分類/NER) 的關鍵優勢。"
     },
     {
       "id": 3,
       "subject": "L21",
-      "topic": "BERT 遮罩語言模型（MLM）",
-      "content": "遮住 15% 詞讓模型猜，左右文都能看所以叫雙向。考試：15% 中 80% 換[MASK]、10% 換隨機詞、10% 保留原詞。"
+      "topic": "Word2Vec 與 GloVe 差異",
+      "content": "Word2Vec 與 GloVe 在詞向量訓練方法上的主要差異為何？\n\n(A) Word2Vec 以詞頻權重，GloVe 隨機初始化\n(B) Word2Vec 基於全局統計，GloVe 用神經網路\n(C) Word2Vec 為預測模型，GloVe 為共現統計模型\n(D) Word2Vec 僅用於靜態語料，GloVe 可即時更新\n\n✅ 答案：C\n💡 Word2Vec 以中心詞/上下文做預測學習 (Skip-gram/CBOW)；GloVe 則分解全語料的共現矩陣。"
     },
     {
       "id": 4,
       "subject": "L21",
-      "topic": "BERT 雙向編碼與 NSP",
-      "content": "預訓練含 MLM 和下句預測（NSP）兩個任務，同一詞根據上下文有不同向量。考試：BERT-base 12層、768維、110M參數。"
+      "topic": "TF-IDF 長文本限制",
+      "content": "以 TF-IDF 分析長文本顧客回饋時，無法準確反映關鍵詞重要性的主要原因？\n\n(A) 長文本詞頻偏高，常見詞權重被過度放大\n(B) 缺乏句子邊界造成無法計算詞頻\n(C) TF-IDF 無法同時處理多份文件\n(D) 長文本改變 IDF 使所有詞權重趨同\n\n✅ 答案：A\n💡 TF 隨文本長度線性放大，未正規化會讓高頻但無資訊的詞 (如「的」「是」) 權重失真。"
     },
     {
       "id": 5,
       "subject": "L21",
-      "topic": "GPT 單向生成架構",
-      "content": "只看左側預測下一詞，使用 Decoder-only 架構。考試：生成任務選GPT；理解分類選BERT；兩者皆有選T5（Encoder-Decoder）。"
+      "topic": "N-gram 長距離依賴",
+      "content": "N-gram 語言模型生成的句子片段合理但整體語意不連貫，此問題最可能源自？\n\n(A) 計算量龐大導致長句無法收斂\n(B) 僅依固定長度前序詞建立機率，難捕捉長距離依賴\n(C) 缺乏語意嵌入層無法表徵詞義相似度\n(D) 假設詞與詞間相互獨立\n\n✅ 答案：B\n💡 N-gram 只看前 n-1 個詞，無法記住段落主題，這是 RNN/Transformer 誕生的重要動機。"
     },
     {
       "id": 6,
       "subject": "L21",
-      "topic": "Word2Vec：CBOW vs Skip-gram",
-      "content": "CBOW 用周圍詞猜中間詞，訓練快；Skip-gram 用中間詞猜周圍詞，對低頻詞更好。考試：兩者都是靜態詞向量。"
+      "topic": "mAP 與 IoU 閾值",
+      "content": "智慧監控物件偵測以 mAP 評估，IoU 閾值設定較高代表？\n\n(A) 預測框與真實框重疊度越高才算成功，偵測越精準\n(B) 誤差越大導致 mAP 數值上升\n(C) Precision 降低但 Recall 上升\n(D) 評估結果不受真實框大小影響\n\n✅ 答案：A\n💡 IoU (交集/聯集) 越高對定位精度要求越嚴。常見標準：mAP@0.5、mAP@0.5:0.95。"
     },
     {
       "id": 7,
       "subject": "L21",
-      "topic": "GloVe 與 Word2Vec 差異",
-      "content": "GloVe 用全局共現矩陣訓練；Word2Vec 用局部滑動窗口。考試：兩者都輸出靜態詞向量，不像 BERT 有動態上下文表示。"
+      "topic": "RAG 檢索階段挑戰",
+      "content": "建立高效能 RAG 系統時，「檢索階段」最關鍵的挑戰為何？\n\n(A) 確保檢索文件能完整納入上下文視窗\n(B) 選擇 Faiss 或 ScaNN 近似最近鄰函式庫\n(C) 降低嵌入模型在高維空間的計算成本\n(D) 避免檢索結果僅語意相似但與查詢意圖無關\n\n✅ 答案：D\n💡 Retrieval 核心難題是「語意相似 ≠ 回答所需」，常需 re-ranking 或混合檢索避免誤導生成。"
     },
     {
       "id": 8,
       "subject": "L21",
-      "topic": "TF-IDF 原理",
-      "content": "TF-IDF = 詞頻 × 逆文件頻率，值高代表該詞是文章的關鍵詞。考試：IDF = log(N/df)，高頻詞如「的」IDF 接近 0。"
+      "topic": "Attention Collapse 處理",
+      "content": "Transformer 發生「注意力分布過於平均」無法聚焦關鍵資訊時，有效改善策略？\n\n(A) 提高 Query-Key 點積縮放常數\n(B) Softmax 前加入高斯雜訊\n(C) 以 ReLU 取代 Softmax\n(D) 對注意力權重施加稀疏化約束\n\n✅ 答案：D\n💡 Attention Collapse 指權重趨於均勻。Sparse Attention / Top-K 可迫使模型聚焦少數關鍵 token。"
     },
     {
       "id": 9,
       "subject": "L21",
-      "topic": "TF-IDF 限制",
-      "content": "不懂語意、向量稀疏、忽略詞序。考試：「狗咬人」和「人咬狗」的 TF-IDF 結果完全相同，這正是 Word2Vec/BERT 出現的動機。"
+      "topic": "GAN 模式崩潰解法",
+      "content": "GAN 生成人臉時出現「模式崩潰 (Mode Collapse)」，最常用的解決方法？\n\n(A) 鑑別器加入梯度懲罰\n(B) 採用 Wasserstein 距離 (WGAN 損失)\n(C) 對潛在向量加入隨機擾動\n(D) 使用多尺度鑑別器\n\n✅ 答案：B\n💡 Mode Collapse = 多樣性崩塌。WGAN 用 Earth Mover 距離取代 JS 散度，梯度更平滑訓練更穩。"
     },
     {
       "id": 10,
       "subject": "L21",
-      "topic": "RAG 檢索增強生成",
-      "content": "先向量搜尋相關文件，塞進 prompt 讓 LLM 回答，不用重訓就能更新知識。考試：Chunk Size 和 Top-K 設定影響品質。"
+      "topic": "多模態資料缺失",
+      "content": "多模態模型推論時遇某模態缺失 (如有影像無文本)，最有效維持效能的策略？\n\n(A) 以零向量或固定向量填充缺失輸入\n(B) 訓練具備模態缺失感知能力的模型\n(C) 用生成模型預測並補全缺失模態\n(D) 直接捨棄缺少模態的樣本\n\n✅ 答案：B\n💡 Modality Dropout 類方法：訓練時隨機屏蔽某模態，讓模型學會在缺失狀況下仍穩健推論。"
     },
     {
       "id": 11,
       "subject": "L21",
-      "topic": "CNN 卷積層原理",
-      "content": "小濾波器在圖片滑動做點積，輸出 feature map。局部連接加參數共享大幅減少參數量。考試：輸出大小 = (W-F+2P)/S+1。"
+      "topic": "資料漂移偵測 (KL 散度)",
+      "content": "顧客流失模型上線後準確率下降，懷疑 Data Drift，最適合用來偵測分佈變化的方法？\n\n(A) 定期重新訓練模型\n(B) 提升模型複雜度\n(C) 增加測試資料量\n(D) 計算輸入特徵分佈間的 KL 散度\n\n✅ 答案：D\n💡 重訓是「應對」不是「偵測」。KL Divergence / PSI / JS 散度才是量化分佈差異的標準指標。"
     },
     {
       "id": 12,
       "subject": "L21",
-      "topic": "CNN 池化層與參數共享",
-      "content": "Max Pooling 取最大值縮小特徵圖，增加平移不變性。考試：池化層無可學習參數；參數共享讓卷積層參數遠少於全連接層。"
+      "topic": "PSI 模型監控指標",
+      "content": "AI 模型在生產環境中，最能提早偵測效能下滑風險的監控指標？\n\n(A) 系統 CPU 與記憶體使用率波動\n(B) 模型推論結果的置信度分佈變化\n(C) API 平均回應時間與延遲百分位數\n(D) 輸入特徵與訓練資料分佈差異的 PSI\n\n✅ 答案：D\n💡 PSI (Population Stability Index)：<0.1 穩定、0.1-0.25 輕微漂移、>0.25 顯著漂移，金融業標準。"
     },
     {
       "id": 13,
       "subject": "L21",
-      "topic": "物件偵測 mAP",
-      "content": "各類別 Precision-Recall 曲線下面積的平均值。考試：mAP@0.5:0.95 在多個 IoU 閾值下取平均，比 mAP@0.5 更嚴格。"
+      "topic": "全景分割 (Panoptic)",
+      "content": "自駕車影像要同時辨識每像素類別 (道路、行人) 又區分同類個體 (多位行人)，最適合？\n\n(A) 語義分割 (Semantic Segmentation)\n(B) 物件偵測 (Object Detection)\n(C) 實例分割 (Instance Segmentation)\n(D) 全景分割 (Panoptic Segmentation)\n\n✅ 答案：D\n💡 Semantic=分類別；Instance=分個體；Panoptic=兩者兼顧 (背景 stuff + 物件 things 統一輸出)。"
     },
     {
       "id": 14,
       "subject": "L21",
-      "topic": "物件偵測 IoU",
-      "content": "IoU = 重疊面積 / 聯集面積，≥0.5 才算 TP。考試：IoU 也是 NMS（非極大值抑制）的基礎，用來去除重複偵測框。"
+      "topic": "CLIP 零樣本分類",
+      "content": "CLIP 在無需新標註資料、僅透過文字提示即可辨識影像的關鍵技術特性？\n\n(A) 圖文對比學習將影像與文字映射至共同嵌入空間，以語意相似度做零樣本分類\n(B) 影像增強與特徵擴散降低標註需求\n(C) 監督式 MLP 分類影像特徵\n(D) 自迴歸模型生成文字標籤\n\n✅ 答案：A\n💡 CLIP 用大量 (圖,文) 對訓練對比損失，讓圖的 embedding 靠近描述它的文字 embedding。"
     },
     {
       "id": 15,
       "subject": "L21",
-      "topic": "語義分割",
-      "content": "每個像素標類別，同類不分個體。U-Net 用跳接（skip connection）把編碼器特徵傳解碼器保留細節。考試：語義分割不分「第一個人」和「第二個人」。"
+      "topic": "Stable Diffusion 生成品質",
+      "content": "Stable Diffusion 生成 4K 產品圖時邊緣顆粒化、細節模糊，僅能在生成階段調整時最佳作法？\n\n(A) 降低取樣步數，縮短生成時間\n(B) 增加取樣步數並選用高品質取樣器\n(C) 提高 CFG 值使結果更具創意多樣性\n(D) 改用低解析度輸入降低成本\n\n✅ 答案：B\n💡 Sampling steps 不足易顆粒化；DPM++、Euler a 等取樣器各有品質/速度權衡。CFG 過高反而過飽和。"
     },
     {
       "id": 16,
       "subject": "L21",
-      "topic": "實例分割與全景分割",
-      "content": "實例分割區分同類不同個體（Mask R-CNN）；全景 = 語義 + 實例。考試：難度排序 語義 < 實例 < 全景。"
+      "topic": "VAE / GAN / Diffusion 差異",
+      "content": "三者在跨模態生成策略的根本差異，最正確的敘述？\n\n(A) VAE 顯式潛在變數建模，適合語意結構但解析度有限；GAN 對抗損失品質高但穩定性差；Diffusion 以條件去噪實現高保真生成\n(B) VAE 與 Diffusion 皆屬隱式生成，依賴對抗訓練\n(C) VAE 與 GAN 使用馬爾可夫鏈轉換\n(D) 三者共用潛在空間，僅解碼器不同\n\n✅ 答案：A\n💡 VAE=變分推斷；GAN=Minimax 對抗；Diffusion=逐步去噪，三者理論基礎完全不同。"
     },
     {
       "id": 17,
       "subject": "L21",
-      "topic": "GAN 生成對抗網路",
-      "content": "Generator 造假資料，Discriminator 辨真假，互相對抗到 D(G(z))≈0.5。考試：損失函數是 minimax，生成器最小化、判別器最大化。"
+      "topic": "CI 持續整合核心實踐",
+      "content": "AI 團隊實施持續整合 (CI)，最符合核心實踐且能有效減少整合風險的做法？\n\n(A) 主分支每日固定時間手動合併並測試\n(B) 每次 Commit 後自動觸發建置、單元測試、靜態分析\n(C) 模型訓練完成後定期安排團隊回顧合併\n(D) 透過部署腳本批次釋出至測試環境\n\n✅ 答案：B\n💡 CI 精髓=「頻繁整合 + 自動驗證」。越早發現問題，修復成本越低，這是 DevOps 基石。"
     },
     {
       "id": 18,
       "subject": "L21",
-      "topic": "GAN 模式崩潰與 WGAN",
-      "content": "模式崩潰：生成器只輸出少數樣本。WGAN 用 Earth Mover Distance 取代 JS 散度讓訓練更穩定。考試：WGAN 需加梯度懲罰（WGAN-GP）。"
+      "topic": "不可否認性 (數位簽章)",
+      "content": "銀行 AI 詐欺偵測需符合「不可否認性 (Non-repudiation)」監管要求，最能確保落實的措施？\n\n(A) 為每筆推論記錄輸入輸出的加密雜湊值並簽署數位簽章\n(B) 優化推論延遲至 100ms 以下\n(C) 增加主機備援數量\n(D) 將請求導入負載平衡器\n\n✅ 答案：A\n💡 Non-repudiation=事後無法否認做過。Hash + 數位簽章提供「不可竄改 + 可驗證身份」雙重保證。"
     },
     {
       "id": 19,
       "subject": "L21",
-      "topic": "VAE 變分自編碼器",
-      "content": "編碼器輸出 μ 和 σ 再取樣，讓潛在空間連續可插值。考試：損失 = 重建誤差 + KL散度；重參數化技巧讓梯度可反傳。"
+      "topic": "對抗性攻擊防禦",
+      "content": "AI 風控系統遭對抗性攻擊 (微小擾動騙過模型)，下列何者「不是」針對此攻擊的技術手段？\n\n(A) 強化資料前處理，過濾格式異常輸入\n(B) 訓練時導入對抗樣本提升模型辨識能力\n(C) 推論後以規則引擎檢查業務硬性規定\n(D) 強化網路防火牆阻擋未授權連線\n\n✅ 答案：D\n💡 對抗性攻擊針對「模型決策脆弱性」，不是網路入侵；防火牆擋不到已通過的合法格式輸入。"
     },
     {
       "id": 20,
       "subject": "L21",
-      "topic": "擴散模型取樣步數",
-      "content": "DDPM 需 1000 步去雜訊，DDIM 可縮至 50 步。考試：Stable Diffusion 在潛在空間操作（LDM），不是像素空間，速度快很多。"
-    },
-    {
-      "id": 21,
-      "subject": "L21",
-      "topic": "擴散模型 CFG",
-      "content": "CFG 控制 prompt 影響力，預設值約 7。值越高越符合 prompt 但多樣性下降，>15 易失真。考試：Guidance Scale 就是 CFG Scale。"
-    },
-    {
-      "id": 22,
-      "subject": "L21",
-      "topic": "CLIP 對比學習",
-      "content": "把圖文配對拉近、非配對拉遠，Loss 是 InfoNCE。考試：訓練時 N 個圖文對形成 N×N 矩陣，對角線是正樣本，屬自監督學習。"
-    },
-    {
-      "id": 23,
-      "subject": "L21",
-      "topic": "CLIP 零樣本分類",
-      "content": "把類別名稱編成文字嵌入，和圖片算餘弦相似度，不需 fine-tune 也不需分類資料集。考試：Prompt 寫法（如 'a photo of a {label}'）影響結果。"
-    },
-    {
-      "id": 24,
-      "subject": "L21",
-      "topic": "多模態融合策略",
-      "content": "早期融合合併原始輸入；晚期融合合併預測結果；中期融合合併中間特徵。考試：Cross-Attention 是主流中期融合，LLaVA、BLIP-2 都用這種架構。"
-    },
-    {
-      "id": 25,
-      "subject": "L21",
-      "topic": "模態缺失處理",
-      "content": "可用零向量填充或訓練時隨機丟棄模態增強容忍性。考試：醫療 AI 最常遇到模態缺失（某項檢查結果不存在），強健模型需顯式處理。"
-    },
-    {
-      "id": 26,
-      "subject": "L21",
-      "topic": "EU AI Act 風險分級",
-      "content": "四級：不可接受（禁止）/ 高風險（嚴格審查）/ 有限風險（需揭露）/ 最低風險。考試：高風險需可解釋性、準確性、強健性、人類監督，違規罰 7% 年營收。"
-    },
-    {
-      "id": 27,
-      "subject": "L21",
-      "topic": "EU AI Act 禁止用途",
-      "content": "禁止：公共場所即時人臉辨識、社會信用評分、潛意識操控。考試：搜尋失蹤兒童或防恐是例外；注意即時（禁）vs 後處理（限制較少）的差異。"
-    },
-    {
-      "id": 28,
-      "subject": "L21",
-      "topic": "MLOps Model Registry",
-      "content": "版本管理模型、超參數、訓練資料與評估指標。考試：生命週期 Staging → Production → Archived；沒有 Registry 很難重現實驗結果。"
-    },
-    {
-      "id": 29,
-      "subject": "L21",
-      "topic": "MLOps 完整流程",
-      "content": "資料→特徵→訓練→評估→部署→監控→重訓，全程 CI/CD 自動化。考試：Feature Store 避免 Training-Serving Skew（訓練和推理特徵不一致）。"
-    },
-    {
-      "id": 30,
-      "subject": "L21",
-      "topic": "資料漂移偵測（PSI）",
-      "content": "PSI 衡量輸入分佈偏移：< 0.1 穩定，> 0.25 需重訓。考試：資料漂移 = 輸入分佈改變但映射關係沒變；概念漂移才是映射本身改變。"
-    },
-    {
-      "id": 31,
-      "subject": "L21",
-      "topic": "概念漂移與 KL 散度",
-      "content": "概念漂移：輸入→輸出的映射關係改變（例如疫情改變診斷意義）。考試：KL(P||Q) = ΣP log(P/Q)，不對稱，KL(P||Q) ≠ KL(Q||P)。"
-    },
-    {
-      "id": 32,
-      "subject": "L21",
-      "topic": "對抗性攻擊",
-      "content": "加入人眼看不見的微小擾動讓模型誤判。FGSM 沿梯度方向加雜訊。考試：對抗樣本具遷移性，對 A 模型有效的攻擊往往對 B 也有效。"
-    },
-    {
-      "id": 33,
-      "subject": "L21",
-      "topic": "對抗性攻擊防禦",
-      "content": "對抗訓練（把攻擊樣本加入訓練集）是目前最有效的防禦方法。考試：代價是乾淨資料上的準確率略微下降；沒有方法能抵禦所有攻擊。"
-    },
-    {
-      "id": 34,
-      "subject": "L21",
-      "topic": "特徵工程：Z-score 標準化",
-      "content": "(x-μ)/σ，讓特徵均值為0、標準差為1，消除量綱差異。考試：對離群值敏感，有嚴重離群值改用 RobustScaler（中位數和四分位距）。"
-    },
-    {
-      "id": 35,
-      "subject": "L21",
-      "topic": "目標編碼與交互特徵",
-      "content": "目標編碼用類別的目標均值取代類別值，需搭配 CV 防洩漏。考試：交互特徵（如年齡×收入）捕捉非線性關係，是特徵工程的重要技巧。"
-    },
-    {
-      "id": 36,
-      "subject": "L21",
-      "topic": "Kubernetes 容器化部署",
-      "content": "Pod 是最小部署單位，Deployment 管副本數，Service 對外暴露 API。考試：ConfigMap/Secret 管設定；K8s 實現滾動更新不停機。"
-    },
-    {
-      "id": 37,
-      "subject": "L21",
-      "topic": "Kubernetes Auto Scaling",
-      "content": "HPA 按 CPU 使用率自動增減 Pod 數量，最常考。考試：minReplicas > 0 可緩解冷啟動延遲；KEDA 支援自訂指標（如 Queue 長度）縮放。"
-    },
-    {
-      "id": 38,
-      "subject": "L21",
-      "topic": "不可否認性與數位簽章",
-      "content": "私鑰簽名、公鑰驗證，確保傳送方無法否認訊息。考試：數位簽章同時提供完整性、鑑別性、不可否認性三大保證。SSL/TLS 基於此。"
-    },
-    {
-      "id": 39,
-      "subject": "L21",
-      "topic": "PCA 降維應用",
-      "content": "找方差最大的方向，把高維資料投影到低維。考試：累計解釋變異量≥95% 決定保留幾個主成分；PCA 前必須做 Z-score 標準化。"
-    },
-    {
-      "id": 40,
-      "subject": "L21",
-      "topic": "漸進式部署策略與 CI/CD",
-      "content": "金絲雀先讓 5% 流量測試新版，風險最低；藍綠部署需雙倍資源但回滾最快。考試：ML 模型上線首選金絲雀，可先觀察效能再全量。"
-    },
-    {
-      "id": 41,
-      "subject": "L23",
-      "topic": "L1（Lasso）vs L2（Ridge）正則化",
-      "content": "L1 讓部分權重歸零，有特徵選擇效果；L2 讓所有權重縮小但不歸零。考試：Elastic Net = L1+L2 混合；幾何上菱形約束 vs 球形約束。"
-    },
-    {
-      "id": 42,
-      "subject": "L23",
-      "topic": "正則化強度 λ 的調整",
-      "content": "λ 越大模型越簡單（高偏差）；λ 越小越複雜（高變異）。考試：用交叉驗證選最佳 λ；偏差-變異取捨是正則化的核心概念。"
-    },
-    {
-      "id": 43,
-      "subject": "L23",
-      "topic": "Dropout 原理",
-      "content": "訓練時隨機讓部分神經元歸零，相當於集成多個子網路防過擬合。考試：推理時全開，用 Inverted Dropout 保持期望值一致；LSTM 中只在非遞迴連接用。"
-    },
-    {
-      "id": 44,
-      "subject": "L23",
-      "topic": "早期停止（Early Stopping）",
-      "content": "監控驗證損失，連續 N 個 epoch 不改善就停止並恢復最佳權重。考試：訓練損失下降但驗證損失上升是過擬合信號；patience 是等幾個 epoch 的參數。"
-    },
-    {
-      "id": 45,
-      "subject": "L23",
-      "topic": "K-Fold 交叉驗證",
-      "content": "資料分 K 份輪流當驗證集，取平均效能。考試：不適合時間序列資料；LOO（K=資料筆數）計算代價極高。"
-    },
-    {
-      "id": 46,
-      "subject": "L23",
-      "topic": "交叉驗證的資料洩漏問題",
-      "content": "標準化、目標編碼必須在每個 fold 的訓練集上 fit，不能在 split 前做。考試：sklearn Pipeline 自動把預處理包進 fold，是避免洩漏的最佳實踐。"
-    },
-    {
-      "id": 47,
-      "subject": "L23",
-      "topic": "分層交叉驗證（Stratified K-Fold）",
-      "content": "每個 fold 維持與整體相同的類別比例。考試：類別不平衡時必用，否則某 fold 可能完全沒有少數類，指標沒有意義。"
-    },
-    {
-      "id": 48,
-      "subject": "L23",
-      "topic": "時間序列交叉驗證",
-      "content": "不能隨機 shuffle，用 Walk-Forward（擴張窗口）驗證。考試：sklearn 的 TimeSeriesSplit 實現此邏輯；Gap 參數可加入緩衝期避免洩漏。"
-    },
-    {
-      "id": 49,
-      "subject": "L23",
-      "topic": "Random Forest 特徵子集選取",
-      "content": "每個節點分裂只從 √n 個隨機特徵中選最佳。考試：降低樹間相關性是集成效果好的關鍵；純 Bagging 用全部特徵，相關性較高。"
-    },
-    {
-      "id": 50,
-      "subject": "L23",
-      "topic": "Random Forest 特徵重要性",
-      "content": "計算各特徵造成的不純度下降量平均值。考試：高基數特徵易被高估，搭配置換重要性（Permutation Importance）或 SHAP 更可靠。"
-    },
-    {
-      "id": 51,
-      "subject": "L23",
-      "topic": "XGBoost 正則化",
-      "content": "目標函數加 γT + ½λΣw²，T 是葉節點數，比 GBDT 更不易過擬合。考試：重要超參數 max_depth、learning_rate、subsample、colsample_bytree。"
-    },
-    {
-      "id": 52,
-      "subject": "L23",
-      "topic": "XGBoost 並行化與特點",
-      "content": "單棵樹的節點分裂搜索可並行；自動處理缺失值。考試：LightGBM 比 XGBoost 快（Leaf-wise + 直方圖近似）；CatBoost 自動處理類別特徵。"
-    },
-    {
-      "id": 53,
-      "subject": "L23",
-      "topic": "DBSCAN 密度聚類",
-      "content": "ε 鄰域內有 minPts 個點才是核心點；鄰近核心的是邊界點；其餘是雜訊點，標籤為 -1。考試：能找任意形狀的群，雜訊點標籤 -1 是必考細節。"
-    },
-    {
-      "id": 54,
-      "subject": "L23",
-      "topic": "K-means 原理與限制",
-      "content": "交替執行「歸入最近中心」和「更新中心」，最小化群內平方和（WCSS）。考試：需預先指定 K；用 Elbow Method 或 Silhouette Score 選 K。"
-    },
-    {
-      "id": 55,
-      "subject": "L23",
-      "topic": "PCA 特徵值與解釋變異量",
-      "content": "解釋變異量 = 特徵值 / 所有特徵值之和。考試：給定特徵值 [4,2,1,1]，前兩個解釋 (4+2)/8 = 75% 的方差；PCA 前必須標準化。"
-    },
-    {
-      "id": 56,
-      "subject": "L23",
-      "topic": "KNN 距離度量與特徵縮放",
-      "content": "找最近 K 個鄰居多數決（分類）或平均（回歸）。考試：必須做特徵縮放；K 太小過擬合，K 太大欠擬合；KNN 是 Lazy Learner，推理需查遍所有訓練資料。"
-    },
-    {
-      "id": 57,
-      "subject": "L23",
-      "topic": "SVM 核函數",
-      "content": "核技巧把資料映射高維找線性超平面，不需真正計算高維向量。考試：RBF 核 γ 越大邊界越複雜；C 越大間隔越小越不容忍誤分類（皆易過擬合）。"
-    },
-    {
-      "id": 58,
-      "subject": "L23",
-      "topic": "LSTM 時序預測",
-      "content": "三個門（遺忘、輸入、輸出）解決 RNN 梯度消失。Cell State 是長期記憶高速公路。考試：GRU 合併遺忘門和輸入門，參數更少、效果相當。"
-    },
-    {
-      "id": 59,
-      "subject": "L23",
-      "topic": "MLP Dense 層參數量計算",
-      "content": "參數量 = (輸入×輸出) + 輸出（bias）。考試：784→256→10 共 (784×256+256)+(256×10+10) = 203,530 個參數。別忘了加 bias。"
-    },
-    {
-      "id": 60,
-      "subject": "L23",
-      "topic": "VGG16 架構特點",
-      "content": "13 卷積層 + 3 全連接層，共 138M 參數，其中 120M 集中在全連接層。考試：現代架構用 Global Average Pooling 取代全連接層，大幅減少參數。"
-    },
-    {
-      "id": 61,
-      "subject": "L23",
-      "topic": "遷移學習凍結層",
-      "content": "先凍結 features（卷積層）只訓 classifier，穩定後再解凍微調。考試：解凍時學習率需調小至 1e-5，防止 Catastrophic Forgetting（預訓練特徵被破壞）。"
-    },
-    {
-      "id": 62,
-      "subject": "L23",
-      "topic": "Adam 優化器",
-      "content": "結合 Momentum（一階矩）和 RMSProp（二階矩）自動調整學習率。考試：β1=0.9、β2=0.999；AdamW = Adam + Weight Decay 解耦，現在更常用。"
-    },
-    {
-      "id": 63,
-      "subject": "L23",
-      "topic": "SGD+Momentum 與 RMSProp",
-      "content": "Momentum 加慣性可越過鞍點；RMSProp 自動縮放學習率，適合 RNN。考試：SGD+Momentum 有時在 CV 任務泛化比 Adam 好；Adagrad 學習率單調遞減。"
-    },
-    {
-      "id": 64,
-      "subject": "L23",
-      "topic": "非凸函數與局部最優解",
-      "content": "深度學習損失函數有大量鞍點，鞍點比局部最優更難逃（梯度接近 0）。考試：Momentum 有助逃離鞍點；小 Batch Size 的雜訊也有助跳出局部最優。"
-    },
-    {
-      "id": 65,
-      "subject": "L23",
-      "topic": "F1 分數計算",
-      "content": "F1 = 2PR/(P+R)，P = TP/(TP+FP)，R = TP/(TP+FN)。考試：TP=80, FP=20, FN=40 → P=0.8, R≈0.667, F1≈0.727。"
-    },
-    {
-      "id": 66,
-      "subject": "L23",
-      "topic": "macro vs micro F1",
-      "content": "macro：各類別 F1 取平均，公平對待稀少類；micro：所有類別的 TP/FP/FN 加總再算，多數類主導。考試：關心稀有類別（如罕見病）用 macro F1。"
-    },
-    {
-      "id": 67,
-      "subject": "L23",
-      "topic": "R² 決定係數",
-      "content": "R² = 1 - SS_res/SS_tot，越接近 1 越好，<0 代表比猜均值還差。考試：加入多餘特徵 R² 不降，用 Adjusted R² = 1-(1-R²)(n-1)/(n-k-1) 懲罰多餘特徵。"
-    },
-    {
-      "id": 68,
-      "subject": "L23",
-      "topic": "殘差圖解讀",
-      "content": "好的殘差圖：點隨機散布在零線附近。考試：U 型→漏掉非線性關係；喇叭形→異方差（Heteroscedasticity）；兩者都違反 OLS 假設。"
-    },
-    {
-      "id": 69,
-      "subject": "L23",
-      "topic": "SMOTE 過採樣",
-      "content": "在少數類樣本之間插值生成合成樣本，非直接複製。考試：SMOTE 必須在 fold 的訓練集內部做，在 split 前做會導致驗證集被污染。"
-    },
-    {
-      "id": 70,
-      "subject": "L23",
-      "topic": "類別不平衡處理策略",
-      "content": "Accuracy 是最差的不平衡指標，改看 F1/AUC-ROC。考試：可用 SMOTE 過採樣、欠採樣、class_weight='balanced' 或成本敏感學習處理。"
-    },
-    {
-      "id": 71,
-      "subject": "L23",
-      "topic": "貝氏定理",
-      "content": "P(A|B) = P(B|A)×P(A)/P(B)。考試：疾病盛行率 1%、敏感度 99%，陽性預測值約只有 50%，這是貝氏定理的經典考題。"
-    },
-    {
-      "id": 72,
-      "subject": "L23",
-      "topic": "條件機率與獨立性",
-      "content": "P(A|B) = P(A∩B)/P(B)。若 P(A|B)=P(A) 則獨立。考試：不相關（協方差=0）≠ 獨立；X 和 X² 協方差可為 0 但顯然不獨立。"
-    },
-    {
-      "id": 73,
-      "subject": "L23",
-      "topic": "蒙地卡羅方法",
-      "content": "大量隨機取樣估計數值，誤差以 1/√N 速率下降，與維度無關。考試：應用包括 MC Dropout（估計預測不確定性）、強化學習期望回報估計。"
-    },
-    {
-      "id": 74,
-      "subject": "L23",
-      "topic": "同態加密",
-      "content": "可對加密資料直接計算，結果解密後等同於對原始資料計算，服務商看不到原始資料。考試：全同態加密（FHE）支援任意計算，但比明文慢數千倍。"
-    },
-    {
-      "id": 75,
-      "subject": "L23",
-      "topic": "聯邦學習",
-      "content": "各端在本地訓練，只上傳梯度不上傳原始資料，FedAvg 聚合全局模型。考試：Horizontal FL（特徵相同）vs Vertical FL（客戶相同）；Non-IID 資料是主要挑戰。"
-    },
-    {
-      "id": 76,
-      "subject": "L23",
-      "topic": "差分隱私",
-      "content": "加入校準雜訊使加入或刪除一筆資料後輸出分佈變化≤e^ε。考試：ε 越小隱私越強但準確率越低；DP-SGD 是深度學習的標準實作方法。"
-    },
-    {
-      "id": 77,
-      "subject": "L23",
-      "topic": "取樣偏差與標籤偏差",
-      "content": "取樣偏差：訓練資料不代表真實世界；標籤偏差：標注含人類偏見（如歷史招聘資料的性別偏見）。考試：解法包括多樣化資料蒐集和偏差審計。"
-    },
-    {
-      "id": 78,
-      "subject": "L23",
-      "topic": "特徵偏差與 AI 公平性",
-      "content": "代理特徵（如郵遞區號）可隱含種族等受保護屬性，導致歧視。考試：Demographic Parity 和 Equalized Odds 通常互斥（Impossibility Theorem）。"
-    },
-    {
-      "id": 79,
-      "subject": "L23",
-      "topic": "SHAP 與 LIME 可解釋性",
-      "content": "SHAP 基於 Shapley Value 有理論保證，可加性強；LIME 局部線性近似，較快但不穩定。考試：TreeSHAP 對樹模型有多項式時間近似，EU AI Act 高風險 AI 必須可解釋。"
-    },
-    {
-      "id": 80,
-      "subject": "L23",
-      "topic": "標準化 vs 正規化",
-      "content": "Z-score：(x-μ)/σ，不限值域，對離群值較穩健；Min-Max：(x-min)/(max-min)，縮到[0,1]，對離群值極敏感。考試：樹模型不需做特徵縮放。"
+      "topic": "漸進式部署 (Phased Rollout)",
+      "content": "醫院部署 AI 輔助診斷系統，為降低臨床流程衝擊且確保風險可控，最合適的漸進式部署策略？\n\n(A) 從單一專科 (如放射科) 或特定病房開始，逐步擴展至全院\n(B) 先部署於病例量高的急診，加速收集回饋\n(C) 僅在夜班或離峰時段啟用\n(D) 介面啟用提示模式，全院同步體驗但不影響診斷\n\n✅ 答案：A\n💡 Phased Rollout 核心是降低「失敗半徑」：單一單位試點 → 收斂問題 → 再擴展比全院同步安全。"
     }
   ]
 }
