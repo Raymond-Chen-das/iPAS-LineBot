@@ -1,24 +1,42 @@
-# 環境變數（含 token，絕對不能上傳）
+# ─── 環境變數與機密（絕對不能上傳） ─────────────────
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_rsa.pub
 
-# Python 虛擬環境
+# ─── Claude Code / AI 工具設定 ───────────────────────
+.claude/
+.cursor/
+.aider*
+CLAUDE.md
+
+# ─── Python 虛擬環境 ────────────────────────────────
 .venv/
 venv/
 env/
+ENV/
 
-# Python 快取
+# ─── Python 快取與打包檔 ────────────────────────────
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
+build/
+dist/
 
-# IDE 設定
+# ─── IDE / 編輯器 ───────────────────────────────────
 .vscode/
 .idea/
 *.suo
 *.user
+*.swp
+*.swo
 
-# 暫存工具檔（不上傳）
+# ─── 本機暫用工具（取得 LINE ID 用，不上傳） ───────
 ngrok.exe
 ngrok.zip
 cloudflared.exe
@@ -29,7 +47,10 @@ get_userid.py
 _group_id.txt
 get_groupid.py
 
-# 系統檔案
+# ─── 日誌 ───────────────────────────────────────────
+*.log
+
+# ─── 系統檔案 ───────────────────────────────────────
 .DS_Store
 Thumbs.db
-.claude
+desktop.ini
